@@ -21,6 +21,7 @@
     "db:deploy": "pnpm -F @bagyo-rescue/prisma db:deploy",
     "db:dev": "pnpm -F @bagyo-rescue/prisma db:dev",
     "db:status": "pnpm -F @bagyo-rescue/prisma db:status",
+    "supabase:types": "pnpm -F @bagyo-rescue/supabase types:gen",
     "sync:rules": "pnpm dlx tsx tools/context-factory/scripts/sync-rules.mjs",
     "prepare": "husky"
   },
