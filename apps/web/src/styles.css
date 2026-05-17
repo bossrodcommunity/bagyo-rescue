@@ -81,6 +81,9 @@ select {
 }
 
 .page {
+  align-content: start;
+  display: grid;
+  gap: 28px;
   margin: 0 auto;
   max-width: 1180px;
   padding: 32px 28px;
@@ -110,6 +113,44 @@ select {
   font-size: clamp(2rem, 4vw, 4rem);
   line-height: 1;
   margin: 0;
+}
+
+.toolbar--nearby {
+  background: #ffffff;
+  border: 1px solid #dce3ea;
+  border-radius: 8px;
+  display: grid;
+  column-gap: 32px;
+  row-gap: 28px;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 260px);
+  padding: 28px;
+}
+
+.toolbar--nearby > div:first-child {
+  min-width: 0;
+}
+
+.toolbar--nearby h1 {
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  max-width: none;
+  white-space: nowrap;
+}
+
+.toolbar--nearby .action-row {
+  align-items: stretch;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+}
+
+.toolbar--nearby .button,
+.toolbar--nearby button {
+  align-items: center;
+  min-height: 56px;
+  width: 100%;
 }
 
 .hero p {
@@ -155,7 +196,6 @@ button:disabled {
   display: grid;
   gap: 16px;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin-top: 20px;
 }
 
 .metrics article {
@@ -265,13 +305,14 @@ th {
   background: #ffffff;
   border: 1px solid #dce3ea;
   border-radius: 8px;
-  display: flex;
-  gap: 24px;
-  justify-content: space-between;
+  display: grid;
+  gap: 40px;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
   padding: 36px;
 }
 
 .module-hero--flood {
+  background: #ffffff;
   border-color: #afd8ff;
   box-shadow: 0 10px 24px rgba(15, 23, 43, 0.06);
 }
@@ -295,13 +336,30 @@ th {
   gap: 10px;
 }
 
+.module-hero > .action-row {
+  align-items: stretch;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+  justify-self: end;
+  padding: 16px;
+  width: min(100%, 300px);
+}
+
+.module-hero > .action-row .button {
+  align-items: center;
+  min-height: 56px;
+  width: 100%;
+}
+
 .report-panel {
   background: #ffffff;
   border: 1px solid #dce3ea;
   border-radius: 8px;
   display: grid;
   gap: 22px;
-  margin-top: 24px;
   padding: 24px;
 }
 
@@ -326,6 +384,42 @@ th {
   margin: 0;
 }
 
+.coordinate-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.coordinate-badge {
+  background: #d7ebff;
+  border: 1px solid #afd8ff;
+  border-radius: 999px;
+  color: #144d81;
+  display: inline-flex;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1;
+  padding: 6px 10px;
+}
+
+.coordinate-map-link {
+  background: #ffffff;
+  border: 1px solid #afd8ff;
+  border-radius: 999px;
+  color: #0f5ea0;
+  display: inline-flex;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1;
+  padding: 6px 10px;
+  text-decoration: none;
+}
+
+.coordinate-map-link:hover {
+  background: #eff7ff;
+}
+
 .location-card small {
   color: #64748b;
   display: block;
@@ -338,7 +432,7 @@ th {
 }
 
 .field-group--inline {
-  margin-top: 16px;
+  margin-top: 0;
 }
 
 .field-group span {
@@ -431,7 +525,6 @@ th {
   border-radius: 8px;
   color: #0f5ea0;
   font-weight: 700;
-  margin-top: 22px;
   padding: 14px 16px;
 }
 
@@ -442,7 +535,6 @@ th {
 .nearby-list {
   display: grid;
   gap: 14px;
-  margin-top: 18px;
 }
 
 .flood-report-card,
@@ -528,10 +620,22 @@ th {
   .app-header,
   .hero,
   .toolbar,
-  .module-hero,
   .location-card {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .module-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .toolbar--nearby {
+    grid-template-columns: 1fr;
+  }
+
+  .module-hero > .action-row {
+    justify-self: stretch;
+    width: 100%;
   }
 
   .metrics,

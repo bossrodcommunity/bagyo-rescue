@@ -20,17 +20,12 @@ function FloodReportPage() {
   const addFloodReport = useAddFloodReport();
   const { location, detectLocation } = useCurrentLocation();
   const [riskLevel, setRiskLevel] = useState<FloodRiskLevel>('medium');
-  const [barangay, setBarangay] = useState('');
   const [locationError, setLocationError] = useState<string | null>(null);
   const [submittedReportId, setSubmittedReportId] = useState<string | null>(null);
 
   function submitReport() {
-    const normalizedBarangay = barangay.trim();
-
-    if (location.status !== 'ready' && !normalizedBarangay) {
-      setLocationError(
-        'Allow location access to confirm your current location, or enter a barangay.'
-      );
+    if (location.status !== 'ready') {
+      setLocationError('Use GPS before submitting a report.');
       return;
     }
 
@@ -41,7 +36,7 @@ function FloodReportPage() {
         latitude: location.status === 'ready' ? location.latitude : null,
         longitude: location.status === 'ready' ? location.longitude : null,
         accuracy: location.status === 'ready' ? location.accuracy : null,
-        barangay: normalizedBarangay || null,
+        barangay: null,
         riskLevel,
       },
       {
@@ -67,24 +62,13 @@ function FloodReportPage() {
           <div>
             <h2>Current location</h2>
             <p>{getLocationCopy(location)}</p>
-            <small>
-              Allow location access to confirm your current GPS position, or enter the barangay
-              below.
-            </small>
+            <LocationCoordinateBadges location={location} />
+            <small>Use GPS to add your current location.</small>
           </div>
           <button type="button" className="button--secondary" onClick={detectLocation}>
             {location.status === 'loading' ? 'Detecting' : 'Use GPS'}
           </button>
         </div>
-
-        <label className="field-group">
-          <span>Barangay</span>
-          <input
-            value={barangay}
-            onChange={event => setBarangay(event.target.value)}
-            placeholder="Enter barangay if GPS is unavailable"
-          />
-        </label>
 
         {locationError ? <p className="form-error">{locationError}</p> : null}
 
@@ -107,6 +91,29 @@ function FloodReportPage() {
         ) : null}
       </section>
     </main>
+  );
+}
+
+function LocationCoordinateBadges({ location }: { location: CurrentLocationState }) {
+  if (location.status !== 'ready') {
+    return null;
+  }
+
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}`;
+
+  return (
+    <div className="coordinate-badges" aria-label="GPS coordinates">
+      <span className="coordinate-badge">Lat {location.latitude.toFixed(5)}</span>
+      <span className="coordinate-badge">Long {location.longitude.toFixed(5)}</span>
+      <a
+        className="coordinate-map-link"
+        href={googleMapsUrl}
+        rel="noreferrer"
+        target="_blank"
+      >
+        Open in Google Maps
+      </a>
+    </div>
   );
 }
 
@@ -143,17 +150,16 @@ function OptionGroup<TValue extends string>({
 
 function getLocationCopy(location: CurrentLocationState) {
   if (location.status === 'loading') {
-    return 'Getting your current GPS position.';
+    return 'Finding your location now.';
   }
 
   if (location.status === 'ready') {
-    const accuracy = location.accuracy ? ` Accuracy about ${Math.round(location.accuracy)}m.` : '';
-    return `${location.latitude.toFixed(5)}, ${location.longitude.toFixed(5)}.${accuracy}`;
+    return 'GPS location added.';
   }
 
   if (location.status === 'error') {
     return location.message;
   }
 
-  return 'Use GPS or enter a barangay before submitting a report.';
+  return 'Use GPS before submitting a report.';
 }

@@ -43,7 +43,7 @@ function NearbyFloodReportsPage() {
 
   return (
     <main className="page page--narrow">
-      <section className="toolbar">
+      <section className="toolbar toolbar--nearby">
         <div>
           <p className="eyebrow">Nearby flood reports</p>
           <h1>Check your area</h1>
