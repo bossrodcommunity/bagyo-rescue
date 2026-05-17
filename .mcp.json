@@ -1,13 +1,5 @@
 {
   "mcpServers": {
-    "postgres": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-postgres",
-        "postgresql://bagyo-rescue:password@localhost:5432/bagyo-rescue"
-      ]
-    },
     "supabase": {
       "type": "http",
       "url": "https://mcp.supabase.com/mcp"
