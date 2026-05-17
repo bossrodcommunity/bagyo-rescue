@@ -28,7 +28,7 @@ export function useCurrentLocation() {
       () => {
         setLocation({
           status: 'error',
-          message: 'Allow location access so BantayBaha can check reports near you.',
+          message: 'Allow location access so Bagyo Rescue can check flood reports near you.',
         });
       },
       {

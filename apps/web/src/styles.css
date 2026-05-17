@@ -276,7 +276,8 @@ th {
   box-shadow: 0 10px 24px rgba(15, 23, 43, 0.06);
 }
 
-.module-hero h1 {
+.module-hero h1,
+.module-hero h2 {
   font-size: clamp(2rem, 4vw, 3.5rem);
   line-height: 1;
   margin: 0;

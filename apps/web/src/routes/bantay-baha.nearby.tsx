@@ -53,7 +53,7 @@ function NearbyFloodReportsPage() {
             {location.status === 'loading' ? 'Detecting' : 'Use GPS'}
           </button>
           <Link to="/bantay-baha/report" className="button">
-            Baha dito
+            Report flooding
           </Link>
         </div>
       </section>
@@ -102,8 +102,8 @@ function NearbyFloodReportsPage() {
           <div className="empty-state">
             <h2>No active flood reports nearby</h2>
             <p>
-              Local reports will appear here after someone submits a BantayBaha report from this
-              device.
+              Local reports will appear here after someone submits a Bagyo Rescue flood report from
+              this device.
             </p>
           </div>
         )}

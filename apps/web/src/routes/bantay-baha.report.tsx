@@ -54,8 +54,8 @@ function FloodReportPage() {
     <main className="page page--narrow">
       <section className="toolbar">
         <div>
-          <p className="eyebrow">One-tap flood report</p>
-          <h1>Baha dito</h1>
+          <p className="eyebrow">Bagyo Rescue flood report</p>
+          <h1>Report flooding here</h1>
         </div>
         <Link to="/bantay-baha" className="button button--secondary">
           Back

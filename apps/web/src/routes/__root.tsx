@@ -34,7 +34,7 @@ function RootLayout() {
             Reports
           </Link>
           <Link to="/bantay-baha" activeProps={{ className: 'active' }}>
-            BantayBaha
+            Flood reporting
           </Link>
         </nav>
       </header>

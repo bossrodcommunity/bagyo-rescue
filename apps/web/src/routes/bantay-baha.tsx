@@ -28,24 +28,24 @@ function BantayBahaPage() {
     <main className="page">
       <section className="module-hero module-hero--flood">
         <div>
-          <p className="eyebrow">Crowdsourced flood warnings</p>
-          <h1>BantayBaha keeps flood risk visible for rescue teams.</h1>
+          <p className="eyebrow">Bagyo Rescue flood reporting</p>
+          <h1>Report current flooding where you are.</h1>
           <p>
-            Prompt nearby flood risk from GPS, save it locally, and keep responders oriented around
-            the Bagyo Rescue mission.
+            Use your current GPS location or barangay to submit active flood conditions, then check
+            local reports that can guide rescue decisions.
           </p>
         </div>
         <div className="action-row">
           <Link to="/bantay-baha/report" className="button">
-            Baha dito
+            Report flooding
           </Link>
           <Link to="/bantay-baha/nearby" className="button button--secondary">
-            Nearby reports
+            Check nearby flooding
           </Link>
         </div>
       </section>
 
-      <section className="metrics" aria-label="BantayBaha local report summary">
+      <section className="metrics" aria-label="Bagyo Rescue flood report summary">
         <article>
           <span>{activeReports.length}</span>
           <p>Active local reports</p>

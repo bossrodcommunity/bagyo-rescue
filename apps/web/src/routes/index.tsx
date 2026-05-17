@@ -48,6 +48,25 @@ function DashboardPage() {
         </Link>
       </section>
 
+      <section className="module-hero module-hero--flood">
+        <div>
+          <p className="eyebrow">Current flood conditions</p>
+          <h2>Report flooding from your current location.</h2>
+          <p>
+            Bagyo Rescue includes a local flood reporting flow for teams and residents who need to
+            mark active flooding nearby.
+          </p>
+        </div>
+        <div className="action-row">
+          <Link to="/bantay-baha/report" className="button">
+            Report flooding
+          </Link>
+          <Link to="/bantay-baha/nearby" className="button button--secondary">
+            Check nearby flooding
+          </Link>
+        </div>
+      </section>
+
       <section className="metrics" aria-label="Rescue report summary">
         <article>
           <span>{reports.length}</span>
