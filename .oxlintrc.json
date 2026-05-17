@@ -1,0 +1,41 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "vitest"],
+  "settings": {
+    "react": {
+      "version": "19.0"
+    },
+    "vitest": {
+      "typecheck": false
+    }
+  },
+  "rules": {
+    "no-console": "allow",
+    "typescript/no-explicit-any": "allow",
+    "typescript/consistent-type-imports": "warn",
+    "typescript/no-import-type-side-effects": "warn",
+    "react/exhaustive-deps": "allow",
+    "react/jsx-curly-brace-presence": "deny",
+    "react/no-unescaped-entities": "warn",
+    "react/rules-of-hooks": "allow"
+  },
+  "env": {
+    "builtin": true
+  },
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/dist-ssr/**",
+    "**/.astro/**",
+    "**/.next/**",
+    "**/.turbo/**",
+    "**/.sst/**",
+    "**/.wrangler/**",
+    "**/.netlify/**",
+    "**/.expo/**",
+    "**/coverage/**",
+    "**/routeTree.gen.ts",
+    "**/generated/**",
+    "**/_generated/**"
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "file",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.oxc": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "oxc.enable.oxfmt": true,
+  "oxc.enable.oxlint": true,
+  "oxc.configPath": ".oxlintrc.json",
+  "oxc.disableNestedConfig": true,
+  "oxc.fixKind": "safe_fix",
+  "oxc.lint.run": "onSave",
+  "oxc.requireConfig": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "cSpell.language": "en,en-US,en-GB",
+  "[dockerfile]": {
+    "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+  }
+}

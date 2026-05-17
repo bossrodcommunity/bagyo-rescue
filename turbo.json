@@ -1,0 +1,33 @@
+{
+  "$schema": "https://v2-7-6.turborepo.dev/schema.json",
+  "globalDependencies": [".nvmrc"],
+  "globalEnv": ["NODE_ENV"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".astro/**", ".next/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "test": {
+      "dependsOn": ["build"],
+      "outputs": ["coverage/**"]
+    },
+    "test:run": {
+      "dependsOn": ["build"],
+      "outputs": ["coverage/**"]
+    },
+    "lint": {
+      "dependsOn": ["^build"]
+    },
+    "check:types": {
+      "dependsOn": ["^build"]
+    },
+    "check:spell": {},
+    "clean": {
+      "cache": false
+    }
+  }
+}

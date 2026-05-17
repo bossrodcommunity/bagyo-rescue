@@ -1,0 +1,15 @@
+{
+  "name": "@bagyo-rescue/prisma",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "db:pull": "prisma db pull",
+    "migrate:deploy": "prisma migrate deploy",
+    "migrate:dev": "prisma migrate dev",
+    "migrate:status": "prisma migrate status"
+  },
+  "devDependencies": {
+    "dotenv": "^17.4.2",
+    "prisma": "^7.8.0"
+  }
+}

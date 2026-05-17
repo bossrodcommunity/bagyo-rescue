@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Bagyo Rescue">
+  <rect width="512" height="512" rx="96" fill="#0f766e" />
+  <circle cx="256" cy="224" r="132" fill="#ccfbf1" />
+  <path
+    fill="#134e4a"
+    d="M256 70c85 0 154 69 154 154 0 124-154 206-154 206S102 348 102 224C102 139 171 70 256 70Zm0 58a96 96 0 1 0 0 192 96 96 0 0 0 0-192Z"
+  />
+  <path fill="#f97316" d="M231 164h50v154h-50zM179 216h154v50H179z" />
+</svg>
