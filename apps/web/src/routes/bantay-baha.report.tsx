@@ -85,7 +85,7 @@ function FloodReportPage() {
 
         {submittedReportId ? (
           <div className="success-message">
-            <p>Flood report saved locally. It can sync later.</p>
+            <p>Saved on this device. It will sync when internet is available.</p>
             <Link to="/bantay-baha/nearby">View nearby reports</Link>
           </div>
         ) : null}
@@ -105,12 +105,7 @@ function LocationCoordinateBadges({ location }: { location: CurrentLocationState
     <div className="coordinate-badges" aria-label="GPS coordinates">
       <span className="coordinate-badge">Lat {location.latitude.toFixed(5)}</span>
       <span className="coordinate-badge">Long {location.longitude.toFixed(5)}</span>
-      <a
-        className="coordinate-map-link"
-        href={googleMapsUrl}
-        rel="noreferrer"
-        target="_blank"
-      >
+      <a className="coordinate-map-link" href={googleMapsUrl} rel="noreferrer" target="_blank">
         Open in Google Maps
       </a>
     </div>

@@ -5,6 +5,16 @@ export type RescueStatus = 'new' | 'triaged' | 'responding' | 'resolved';
 export type FloodRiskLevel = 'low' | 'medium' | 'high' | 'critical' | 'unknown';
 export type FloodReportStatus = 'active' | 'cleared' | 'disputed' | 'expired';
 export type FloodReportConfidence = 'low' | 'medium' | 'high';
+export type OutboxItemType = 'flood-report.create';
+export type OutboxItemStatus = 'pending' | 'syncing' | 'failed' | 'synced';
+
+export type AddFloodReportInput = {
+  latitude: number | null;
+  longitude: number | null;
+  accuracy: number | null;
+  barangay: string | null;
+  riskLevel: FloodRiskLevel;
+};
 
 export type RescueReport = {
   id: string;
@@ -31,9 +41,23 @@ export type FloodReport = {
   syncedAt?: number;
 };
 
+export type OutboxItem = {
+  id: string;
+  type: OutboxItemType;
+  entityId: string;
+  payload: AddFloodReportInput;
+  status: OutboxItemStatus;
+  attempts: number;
+  lastError: string | null;
+  createdAt: number;
+  updatedAt: number;
+  syncedAt: number | null;
+};
+
 export const db = new Dexie('bagyoRescue') as Dexie & {
   reports: EntityTable<RescueReport, 'id'>;
   floodReports: EntityTable<FloodReport, 'id'>;
+  outbox: EntityTable<OutboxItem, 'id'>;
 };
 
 db.version(1).stores({
@@ -75,6 +99,12 @@ db.version(4)
         report.barangay ??= null;
       })
   );
+
+db.version(5).stores({
+  reports: 'id, createdAt, priority, status, location',
+  floodReports: 'id, createdAt, expiresAt, status, confidence, riskLevel, barangay',
+  outbox: 'id, type, entityId, status, createdAt, updatedAt, syncedAt',
+});
 
 function getRiskLevelFromLegacyFloodLevel(floodLevel: string | undefined): FloodRiskLevel {
   if (floodLevel === 'ankle') return 'low';

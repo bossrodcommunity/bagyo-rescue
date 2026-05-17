@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { useFloodReports } from '../data/use-flood-reports';
-import type { FloodReport } from '../db/schema';
+import type { FloodReportWithSyncStatus } from '../db/flood-reports';
 import { useCurrentLocation } from '../hooks/use-current-location';
 import { formatDistance, getDistanceMeters } from '../utils/geo';
 
@@ -42,11 +42,15 @@ function NearbyFloodReportsPage() {
   }, [barangayFilter, location, reports]);
 
   return (
-    <main className="page page--narrow">
+    <main className="page page--nearby">
       <section className="toolbar toolbar--nearby">
         <div>
           <p className="eyebrow">Nearby flood reports</p>
           <h1>Check your area</h1>
+          <p className="toolbar-copy">
+            Use GPS for distance-ranked reports, or filter by barangay when location access is not
+            available.
+          </p>
         </div>
         <div className="action-row">
           <button type="button" className="button--secondary" onClick={detectLocation}>
@@ -58,7 +62,8 @@ function NearbyFloodReportsPage() {
         </div>
       </section>
 
-      <section className="status-panel">
+      <section className="status-panel status-panel--nearby">
+        <strong>{nearbyReports.length}</strong>
         <p>{getNearbyStatusCopy(location.status, nearbyReports.length)}</p>
       </section>
 
@@ -75,7 +80,7 @@ function NearbyFloodReportsPage() {
         {nearbyReports.length > 0 ? (
           nearbyReports.map(({ report, distanceMeters }) => (
             <article className="flood-report-card" key={report.id}>
-              <div>
+              <div className="report-card-main">
                 <span className={`pill pill--${report.riskLevel}`}>{formatRiskLevel(report)}</span>
                 <h2>{getRiskHeadline(report)}</h2>
                 <p>{formatLocationSource(report)}</p>
@@ -95,6 +100,10 @@ function NearbyFloodReportsPage() {
                   <dt>Expires</dt>
                   <dd>{formatExpiry(report.expiresAt)}</dd>
                 </div>
+                <div>
+                  <dt>Sync</dt>
+                  <dd>{getSyncStatusCopy(report)}</dd>
+                </div>
               </dl>
             </article>
           ))
@@ -112,21 +121,21 @@ function NearbyFloodReportsPage() {
   );
 }
 
-function isActiveFloodReport(report: FloodReport) {
+function isActiveFloodReport(report: FloodReportWithSyncStatus) {
   return report.status === 'active' && report.expiresAt > Date.now();
 }
 
 function hasGpsLocation(
-  report: FloodReport
-): report is FloodReport & { latitude: number; longitude: number } {
+  report: FloodReportWithSyncStatus
+): report is FloodReportWithSyncStatus & { latitude: number; longitude: number } {
   return report.latitude !== null && report.longitude !== null;
 }
 
-function formatRiskLevel(report: FloodReport) {
+function formatRiskLevel(report: FloodReportWithSyncStatus) {
   return `${report.riskLevel} risk`;
 }
 
-function getRiskHeadline(report: FloodReport) {
+function getRiskHeadline(report: FloodReportWithSyncStatus) {
   if (report.riskLevel === 'critical') return 'Immediate rescue risk';
   if (report.riskLevel === 'high') return 'High flood risk nearby';
   if (report.riskLevel === 'medium') return 'Flood risk reported';
@@ -135,7 +144,7 @@ function getRiskHeadline(report: FloodReport) {
   return 'Flood risk needs verification';
 }
 
-function formatLocationSource(report: FloodReport) {
+function formatLocationSource(report: FloodReportWithSyncStatus) {
   if (report.latitude !== null && report.longitude !== null) {
     return report.barangay
       ? `Confirmed by GPS near ${report.barangay}.`
@@ -147,7 +156,7 @@ function formatLocationSource(report: FloodReport) {
     : 'Location needs confirmation.';
 }
 
-function formatArea(report: FloodReport) {
+function formatArea(report: FloodReportWithSyncStatus) {
   return report.barangay ?? 'Use GPS';
 }
 
@@ -163,16 +172,24 @@ function formatExpiry(expiresAt: number) {
 
 function getNearbyStatusCopy(locationStatus: string, reportCount: number) {
   if (locationStatus === 'loading') {
-    return 'Getting your current location to sort nearby flood reports.';
+    return `active local report${reportCount === 1 ? '' : 's'} while GPS loads.`;
   }
 
   if (locationStatus === 'ready') {
-    return `${reportCount} active report${reportCount === 1 ? '' : 's'} within 5 km.`;
+    return `active report${reportCount === 1 ? '' : 's'} within 5 km.`;
   }
 
   if (locationStatus === 'error') {
-    return 'Location is blocked. Showing active local reports without distance sorting.';
+    return `active local report${reportCount === 1 ? '' : 's'} without distance sorting.`;
   }
 
-  return 'Use GPS to filter active local reports within 5 km.';
+  return `active local report${reportCount === 1 ? '' : 's'}. Use GPS to sort within 5 km.`;
+}
+
+function getSyncStatusCopy(report: FloodReportWithSyncStatus) {
+  if (report.syncStatus === 'syncing') return 'Syncing';
+  if (report.syncStatus === 'synced') return 'Synced';
+  if (report.syncStatus === 'failed') return 'Sync failed';
+
+  return 'Saved locally';
 }

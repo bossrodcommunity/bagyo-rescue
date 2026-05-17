@@ -328,6 +328,54 @@ export type Database = {
           },
         ]
       }
+      flood_reports: {
+        Row: {
+          accuracy: number | null
+          barangay: string | null
+          client_report_id: string
+          confidence: string
+          created_at: string
+          expires_at: string
+          id: string
+          latitude: number | null
+          longitude: number | null
+          reported_at: string
+          risk_level: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          accuracy?: number | null
+          barangay?: string | null
+          client_report_id: string
+          confidence: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          reported_at: string
+          risk_level: string
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          accuracy?: number | null
+          barangay?: string | null
+          client_report_id?: string
+          confidence?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          reported_at?: string
+          risk_level?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       houses: {
         Row: {
           address: string

@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useRouterState } from '@tanstack/react-router';
 import { useMemo } from 'react';
-import { useFloodReports } from '../data/use-flood-reports';
+import { useFloodOutboxSummary, useFloodReports } from '../data/use-flood-reports';
 
 export const Route = createFileRoute('/bantay-baha')({
   component: BantayBahaPage,
@@ -9,7 +9,9 @@ export const Route = createFileRoute('/bantay-baha')({
 function BantayBahaPage() {
   const pathname = useRouterState({ select: state => state.location.pathname });
   const floodReportsQuery = useFloodReports();
+  const outboxSummaryQuery = useFloodOutboxSummary();
   const reports = floodReportsQuery.data ?? [];
+  const outboxSummary = outboxSummaryQuery.data;
 
   const activeReports = useMemo(
     () => reports.filter(report => report.status === 'active' && report.expiresAt > Date.now()),
@@ -59,10 +61,21 @@ function BantayBahaPage() {
           <p>Total saved reports</p>
         </article>
         <article>
-          <span>{floodReportsQuery.isFetching ? 'Syncing' : 'Ready'}</span>
+          <span>{getLocalStatus(floodReportsQuery.isFetching, outboxSummary)}</span>
           <p>Local status</p>
         </article>
       </section>
     </main>
   );
+}
+
+function getLocalStatus(
+  isFetching: boolean,
+  outboxSummary: { failed: number; pending: number; syncing: number; total: number } | undefined
+) {
+  if (outboxSummary?.failed) return 'Retry';
+  if (outboxSummary?.syncing || isFetching) return 'Syncing';
+  if (outboxSummary?.pending) return 'Saved';
+
+  return 'Ready';
 }

@@ -11,6 +11,4 @@ export const getEnvConfig = () =>
     SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY,
   });
 
-export const envConfig = getEnvConfig();
-
 export type EnvConfig = z.infer<typeof envSchema>;

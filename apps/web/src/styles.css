@@ -1,7 +1,8 @@
 :root {
-  color: #18212f;
-  background: #f7f8fb;
+  color: #0f172b;
+  background: #f8fafc;
   font-family:
+    'DM Sans',
     Inter,
     ui-sans-serif,
     system-ui,
@@ -80,6 +81,26 @@ select {
   color: #0f766e;
 }
 
+.offline-banner {
+  align-items: center;
+  background: #fff8e5;
+  border-bottom: 1px solid #ffe28a;
+  color: #755410;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 14px 28px;
+}
+
+.offline-banner p {
+  font-weight: 800;
+  margin: 0;
+}
+
+.offline-banner button {
+  flex: 0 0 auto;
+}
+
 .page {
   align-content: start;
   display: grid;
@@ -91,6 +112,10 @@ select {
 
 .page--narrow {
   max-width: 760px;
+}
+
+.page--nearby {
+  max-width: 980px;
 }
 
 .hero,
@@ -120,10 +145,11 @@ select {
   border: 1px solid #dce3ea;
   border-radius: 8px;
   display: grid;
-  column-gap: 32px;
+  column-gap: 36px;
   row-gap: 28px;
-  grid-template-columns: minmax(0, 1fr) minmax(220px, 260px);
-  padding: 28px;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
+  padding: 34px;
+  box-shadow: 0 10px 24px rgba(15, 23, 43, 0.06);
 }
 
 .toolbar--nearby > div:first-child {
@@ -131,9 +157,16 @@ select {
 }
 
 .toolbar--nearby h1 {
-  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
   max-width: none;
-  white-space: nowrap;
+}
+
+.toolbar-copy {
+  color: #475569;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 14px 0 0;
+  max-width: 560px;
 }
 
 .toolbar--nearby .action-row {
@@ -169,7 +202,7 @@ select {
 
 .button,
 button {
-  background: #0f766e;
+  background: #128ee8;
   border: 0;
   border-radius: 8px;
   color: #ffffff;
@@ -178,13 +211,37 @@ button {
   font-weight: 700;
   justify-content: center;
   padding: 12px 16px;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
   white-space: nowrap;
+}
+
+.button:hover,
+button:hover {
+  background: #0c75c6;
 }
 
 .button--secondary {
   background: #ffffff;
   border: 1px solid #cbd5e1;
   color: #334155;
+}
+
+.button--secondary:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.button:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: 3px solid #7cc0fb;
+  outline-offset: 2px;
 }
 
 button:disabled {
@@ -238,9 +295,14 @@ select {
   background: #ffffff;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
-  min-height: 44px;
-  padding: 0 12px;
+  color: #0f172b;
+  min-height: 48px;
+  padding: 0 14px;
   width: 100%;
+}
+
+input::placeholder {
+  color: #64748b;
 }
 
 .table-wrap {
@@ -532,9 +594,30 @@ th {
   margin: 0;
 }
 
+.status-panel--nearby {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  padding: 16px 18px;
+}
+
+.status-panel--nearby strong {
+  align-items: center;
+  background: #128ee8;
+  border-radius: 999px;
+  color: #ffffff;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 0.95rem;
+  height: 32px;
+  justify-content: center;
+  min-width: 32px;
+  padding: 0 10px;
+}
+
 .nearby-list {
   display: grid;
-  gap: 14px;
+  gap: 16px;
 }
 
 .flood-report-card,
@@ -542,17 +625,25 @@ th {
   background: #ffffff;
   border: 1px solid #dce3ea;
   border-radius: 8px;
-  padding: 18px;
+  padding: 22px;
 }
 
 .flood-report-card {
+  align-items: start;
   display: grid;
-  gap: 16px;
-  grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+  gap: 22px;
+  grid-template-columns: minmax(240px, 1fr) minmax(360px, 0.9fr);
+  box-shadow: 0 1px 2px rgba(15, 23, 43, 0.04);
+}
+
+.report-card-main {
+  min-width: 0;
 }
 
 .flood-report-card h2 {
-  font-size: 1.25rem;
+  color: #0f172b;
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+  line-height: 1.2;
   margin: 10px 0 6px;
   text-transform: capitalize;
 }
@@ -565,8 +656,8 @@ th {
 
 .report-meta {
   display: grid;
-  gap: 10px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   margin: 0;
 }
 
@@ -574,21 +665,26 @@ th {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  padding: 10px;
+  min-width: 0;
+  padding: 12px;
 }
 
 .report-meta dt {
   color: #64748b;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 800;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .report-meta dd {
   color: #0f172b;
+  font-size: 1rem;
   font-weight: 800;
+  line-height: 1.25;
   margin: 4px 0 0;
   text-transform: capitalize;
+  overflow-wrap: anywhere;
 }
 
 .empty-state h2 {
@@ -620,7 +716,8 @@ th {
   .app-header,
   .hero,
   .toolbar,
-  .location-card {
+  .location-card,
+  .offline-banner {
     align-items: flex-start;
     flex-direction: column;
   }
