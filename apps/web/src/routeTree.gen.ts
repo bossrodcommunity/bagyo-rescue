@@ -10,11 +10,19 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ReportsRouteImport } from './routes/reports'
+import { Route as BantayBahaRouteImport } from './routes/bantay-baha'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BantayBahaReportRouteImport } from './routes/bantay-baha.report'
+import { Route as BantayBahaNearbyRouteImport } from './routes/bantay-baha.nearby'
 
 const ReportsRoute = ReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BantayBahaRoute = BantayBahaRouteImport.update({
+  id: '/bantay-baha',
+  path: '/bantay-baha',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -22,30 +30,66 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BantayBahaReportRoute = BantayBahaReportRouteImport.update({
+  id: '/report',
+  path: '/report',
+  getParentRoute: () => BantayBahaRoute,
+} as any)
+const BantayBahaNearbyRoute = BantayBahaNearbyRouteImport.update({
+  id: '/nearby',
+  path: '/nearby',
+  getParentRoute: () => BantayBahaRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/bantay-baha': typeof BantayBahaRouteWithChildren
   '/reports': typeof ReportsRoute
+  '/bantay-baha/nearby': typeof BantayBahaNearbyRoute
+  '/bantay-baha/report': typeof BantayBahaReportRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/bantay-baha': typeof BantayBahaRouteWithChildren
   '/reports': typeof ReportsRoute
+  '/bantay-baha/nearby': typeof BantayBahaNearbyRoute
+  '/bantay-baha/report': typeof BantayBahaReportRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/bantay-baha': typeof BantayBahaRouteWithChildren
   '/reports': typeof ReportsRoute
+  '/bantay-baha/nearby': typeof BantayBahaNearbyRoute
+  '/bantay-baha/report': typeof BantayBahaReportRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/reports'
+  fullPaths:
+    | '/'
+    | '/bantay-baha'
+    | '/reports'
+    | '/bantay-baha/nearby'
+    | '/bantay-baha/report'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/reports'
-  id: '__root__' | '/' | '/reports'
+  to:
+    | '/'
+    | '/bantay-baha'
+    | '/reports'
+    | '/bantay-baha/nearby'
+    | '/bantay-baha/report'
+  id:
+    | '__root__'
+    | '/'
+    | '/bantay-baha'
+    | '/reports'
+    | '/bantay-baha/nearby'
+    | '/bantay-baha/report'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BantayBahaRoute: typeof BantayBahaRouteWithChildren
   ReportsRoute: typeof ReportsRoute
 }
 
@@ -58,6 +102,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReportsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/bantay-baha': {
+      id: '/bantay-baha'
+      path: '/bantay-baha'
+      fullPath: '/bantay-baha'
+      preLoaderRoute: typeof BantayBahaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -65,11 +116,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/bantay-baha/report': {
+      id: '/bantay-baha/report'
+      path: '/report'
+      fullPath: '/bantay-baha/report'
+      preLoaderRoute: typeof BantayBahaReportRouteImport
+      parentRoute: typeof BantayBahaRoute
+    }
+    '/bantay-baha/nearby': {
+      id: '/bantay-baha/nearby'
+      path: '/nearby'
+      fullPath: '/bantay-baha/nearby'
+      preLoaderRoute: typeof BantayBahaNearbyRouteImport
+      parentRoute: typeof BantayBahaRoute
+    }
   }
 }
 
+interface BantayBahaRouteChildren {
+  BantayBahaNearbyRoute: typeof BantayBahaNearbyRoute
+  BantayBahaReportRoute: typeof BantayBahaReportRoute
+}
+
+const BantayBahaRouteChildren: BantayBahaRouteChildren = {
+  BantayBahaNearbyRoute: BantayBahaNearbyRoute,
+  BantayBahaReportRoute: BantayBahaReportRoute,
+}
+
+const BantayBahaRouteWithChildren = BantayBahaRoute._addFileChildren(
+  BantayBahaRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BantayBahaRoute: BantayBahaRouteWithChildren,
   ReportsRoute: ReportsRoute,
 }
 export const routeTree = rootRouteImport

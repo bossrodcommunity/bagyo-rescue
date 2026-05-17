@@ -140,6 +140,12 @@ button {
   white-space: nowrap;
 }
 
+.button--secondary {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+}
+
 button:disabled {
   cursor: wait;
   opacity: 0.72;
@@ -254,16 +260,289 @@ th {
   color: #166534;
 }
 
+.module-hero {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #dce3ea;
+  border-radius: 8px;
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+  padding: 36px;
+}
+
+.module-hero--flood {
+  border-color: #afd8ff;
+  box-shadow: 0 10px 24px rgba(15, 23, 43, 0.06);
+}
+
+.module-hero h1 {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 1;
+  margin: 0;
+}
+
+.module-hero p {
+  color: #475569;
+  max-width: 680px;
+}
+
+.action-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.report-panel {
+  background: #ffffff;
+  border: 1px solid #dce3ea;
+  border-radius: 8px;
+  display: grid;
+  gap: 22px;
+  margin-top: 24px;
+  padding: 24px;
+}
+
+.location-card {
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 18px;
+}
+
+.location-card h2 {
+  font-size: 1rem;
+  margin: 0 0 4px;
+}
+
+.location-card p {
+  color: #475569;
+  margin: 0;
+}
+
+.location-card small {
+  color: #64748b;
+  display: block;
+  margin-top: 6px;
+}
+
+.field-group {
+  display: grid;
+  gap: 8px;
+}
+
+.field-group--inline {
+  margin-top: 16px;
+}
+
+.field-group span {
+  color: #0f172b;
+  font-weight: 800;
+}
+
+.form-error {
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #991b1b;
+  font-weight: 700;
+  margin: 0;
+  padding: 10px 12px;
+}
+
+.option-group {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.option-group legend {
+  color: #0f172b;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.option-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.option-card {
+  align-items: flex-start;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #0f172b;
+  display: flex;
+  flex-direction: column;
+  min-height: 76px;
+  padding: 14px;
+  text-align: left;
+  white-space: normal;
+}
+
+.option-card.active {
+  background: #eff7ff;
+  border-color: #128ee8;
+  color: #0f5ea0;
+}
+
+.option-card span {
+  font-weight: 800;
+}
+
+.option-card small {
+  color: #64748b;
+  display: block;
+  margin-top: 4px;
+}
+
+.success-message {
+  align-items: center;
+  background: #e9fff1;
+  border: 1px solid #95f0b9;
+  border-radius: 8px;
+  color: #0b6a33;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin: 0;
+  padding: 12px 14px;
+}
+
+.success-message p {
+  margin: 0;
+}
+
+.success-message a {
+  color: #0f5ea0;
+  font-weight: 700;
+}
+
+.status-panel {
+  background: #eff7ff;
+  border: 1px solid #afd8ff;
+  border-radius: 8px;
+  color: #0f5ea0;
+  font-weight: 700;
+  margin-top: 22px;
+  padding: 14px 16px;
+}
+
+.status-panel p {
+  margin: 0;
+}
+
+.nearby-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.flood-report-card,
+.empty-state {
+  background: #ffffff;
+  border: 1px solid #dce3ea;
+  border-radius: 8px;
+  padding: 18px;
+}
+
+.flood-report-card {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+}
+
+.flood-report-card h2 {
+  font-size: 1.25rem;
+  margin: 10px 0 6px;
+  text-transform: capitalize;
+}
+
+.flood-report-card p,
+.empty-state p {
+  color: #64748b;
+  margin: 0;
+}
+
+.report-meta {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+}
+
+.report-meta div {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.report-meta dt {
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.report-meta dd {
+  color: #0f172b;
+  font-weight: 800;
+  margin: 4px 0 0;
+  text-transform: capitalize;
+}
+
+.empty-state h2 {
+  font-size: 1.2rem;
+  margin: 0 0 6px;
+}
+
+.pill--unknown {
+  background: #d7ebff;
+  color: #0f5ea0;
+}
+
+.pill--medium {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.pill--high {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.pill--critical {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
 @media (max-width: 880px) {
   .app-header,
   .hero,
-  .toolbar {
+  .toolbar,
+  .module-hero,
+  .location-card {
     align-items: flex-start;
     flex-direction: column;
   }
 
   .metrics,
-  .report-form {
+  .report-form,
+  .option-grid,
+  .flood-report-card,
+  .report-meta {
     grid-template-columns: 1fr;
+  }
+
+  .success-message {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
