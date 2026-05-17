@@ -17,8 +17,8 @@ export function useSubmitReportHistoryMutation(args: UseSubmitReportHistoryMutat
   return useMutation({
     ...args,
     mutationFn: submitReportHistoryService,
-    onSuccess: async (...successArgs) => {
-      await queryClient.invalidateQueries({ queryKey: ['/report-histories'] });
+    onSuccess: (...successArgs) => {
+      void queryClient.invalidateQueries({ queryKey: ['/report-histories'] });
       args.onSuccess?.(...successArgs);
     },
   });

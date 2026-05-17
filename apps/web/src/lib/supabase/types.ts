@@ -704,7 +704,7 @@ export type Database = {
         | 'Safe';
       risk_level: 'Low' | 'Medium' | 'High' | 'Critical';
       sex: 'Male' | 'Female' | 'Other' | 'Prefer Not To Say';
-      water_level: 'None' | 'Ankle' | 'Knee' | 'Waist' | 'Chest' | 'Roof' | 'Unknown';
+      water_level: 'Ankle' | 'Knee' | 'Waist' | 'Chest' | 'Roof' | 'Unknown';
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -872,7 +872,7 @@ export const Constants = {
       ],
       risk_level: ['Low', 'Medium', 'High', 'Critical'],
       sex: ['Male', 'Female', 'Other', 'Prefer Not To Say'],
-      water_level: ['None', 'Ankle', 'Knee', 'Waist', 'Chest', 'Roof', 'Unknown'],
+      water_level: ['Ankle', 'Knee', 'Waist', 'Chest', 'Roof', 'Unknown'],
     },
   },
 } as const;
