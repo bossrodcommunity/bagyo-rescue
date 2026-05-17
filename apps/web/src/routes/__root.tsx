@@ -1,13 +1,13 @@
-import { Link, Outlet, createRootRouteWithContext, useRouterState } from '@tanstack/react-router';
-import type { QueryClient } from '@tanstack/react-query';
-import { IconRefresh } from '@tabler/icons-react';
-import { useEffect, useState } from 'react';
-import { useFloodOutboxSummary, useFloodOutboxSyncProcessor } from '../data/use-flood-reports';
 import { Wordmark } from '@/components/brand/wordmark';
-import { OfflineBadge } from '@/components/ui/offline-badge';
 import { Button } from '@/components/ui/button';
+import { OfflineBadge, useOnlineStatus } from '@/components/ui/offline-badge';
 import { Page } from '@/components/ui/page';
+import { useAuth } from '@/lib/auth';
 import { cn } from '@/lib/utils';
+import { IconLogout, IconRefresh } from '@tabler/icons-react';
+import type { QueryClient } from '@tanstack/react-query';
+import { Link, Outlet, createRootRouteWithContext, useRouterState } from '@tanstack/react-router';
+import { useFloodOutboxSummary, useFloodOutboxSyncProcessor } from '../data/use-flood-reports';
 
 type RouterContext = {
   queryClient: QueryClient;
@@ -28,40 +28,58 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 
 const navItems = [
   { to: '/' as const, label: 'Dashboard' },
-  { to: '/resident' as const, label: 'Resident' },
-  { to: '/ping' as const, label: 'Ping Rescue' },
-  { to: '/reports' as const, label: 'Reports' },
+  { to: '/report-flood' as const, label: 'Report Flood' },
+  { to: '/request-rescue' as const, label: 'Request Rescue' },
+  { to: '/hotlines' as const, label: 'Hotlines' },
   { to: '/bantay-baha' as const, label: 'Flood' },
+  { to: '/records' as const, label: 'Records' },
   { to: '/admin' as const, label: 'Admin' },
 ];
 
 function RootLayout() {
+  const { user, isAuthenticated, logout } = useAuth();
   const syncFloodOutbox = useFloodOutboxSyncProcessor();
   const outboxSummaryQuery = useFloodOutboxSummary();
   const online = useOnlineStatus();
   const outboxSummary = outboxSummaryQuery.data;
   const hasOutboxWork = Boolean(outboxSummary?.total);
   const pathname = useRouterState({ select: state => state.location.pathname });
-  const isResidentRoute = pathname.startsWith('/resident');
+  const isResidentRoute = pathname.startsWith('/resident') || pathname.startsWith('/sign-in');
   const visibleNav = isResidentRoute
-    ? navItems.filter(item => item.to === '/' || item.to === '/resident' || item.to === '/ping')
+    ? navItems.filter(item => ['/', '/request-rescue'].includes(item.to))
     : navItems;
 
   return (
     <div className="min-h-dvh bg-bg text-foreground">
-      <header className="sticky top-0 z-20 border-b border-border bg-surface">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-6 px-5 py-3 sm:px-6">
+      <header className="sticky top-0 z-20 border-b border-border bg-surface/95 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-3 px-5 py-3 sm:px-6">
           <Link to="/" aria-label="Bagyo Rescue" className="flex items-center">
             <Wordmark />
           </Link>
-          <nav aria-label="Primary" className="flex items-center gap-1">
+          <nav aria-label="Primary" className="flex max-w-full items-center gap-1 overflow-x-auto">
             {visibleNav.map(item => (
               <NavLink key={item.to} to={item.to} label={item.label} />
             ))}
-            <span className="ml-3 hidden sm:inline-flex">
-              <OfflineBadge />
-            </span>
           </nav>
+          <div className="flex items-center gap-2">
+            <OfflineBadge />
+            {isAuthenticated ? (
+              <span className="flex items-center gap-2">
+                <span className="hidden max-w-28 truncate text-label-md text-muted-foreground sm:inline">
+                  {user?.username}
+                </span>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  type="button"
+                  aria-label="Sign out"
+                  onClick={() => void logout()}
+                >
+                  <IconLogout className="size-4" aria-hidden="true" />
+                </Button>
+              </span>
+            ) : null}
+          </div>
         </div>
       </header>
       {!online || hasOutboxWork ? (
@@ -95,7 +113,14 @@ function NavLink({
   to,
   label,
 }: {
-  to: '/' | '/resident' | '/ping' | '/reports' | '/bantay-baha' | '/admin';
+  to:
+    | '/'
+    | '/report-flood'
+    | '/request-rescue'
+    | '/hotlines'
+    | '/bantay-baha'
+    | '/records'
+    | '/admin';
   label: string;
 }) {
   const baseClasses =
@@ -113,27 +138,6 @@ function NavLink({
       {label}
     </Link>
   );
-}
-
-function useOnlineStatus() {
-  const [online, setOnline] = useState(() =>
-    typeof navigator === 'undefined' ? true : navigator.onLine
-  );
-
-  useEffect(() => {
-    const markOnline = () => setOnline(true);
-    const markOffline = () => setOnline(false);
-
-    window.addEventListener('online', markOnline);
-    window.addEventListener('offline', markOffline);
-
-    return () => {
-      window.removeEventListener('online', markOnline);
-      window.removeEventListener('offline', markOffline);
-    };
-  }, []);
-
-  return online;
 }
 
 function getSyncBannerCopy(

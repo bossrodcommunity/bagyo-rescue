@@ -1,12 +1,12 @@
 import Dexie, { type EntityTable } from 'dexie';
 import { dexieSchema } from './schema';
-import type { FloodOutboxItem, FloodReport, RescuePing, RescueReport } from './types';
+import type { FloodOutboxItem, FloodReport, ReportHistory, ReportHistoryOutbox } from './types';
 
 export type BagyoRescueDexie = Dexie & {
-  reports: EntityTable<RescueReport, 'id'>;
   floodReports: EntityTable<FloodReport, 'id'>;
   outbox: EntityTable<FloodOutboxItem, 'id'>;
-  rescuePings: EntityTable<RescuePing, 'id'>;
+  reportHistories: EntityTable<ReportHistory, 'id'>;
+  reportHistoryOutbox: EntityTable<ReportHistoryOutbox, 'id'>;
 };
 
 export function createDexieClient() {

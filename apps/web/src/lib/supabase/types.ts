@@ -269,45 +269,143 @@ export type Database = {
           },
         ];
       };
-      rescue_pings: {
+      report_histories: {
         Row: {
+          access_method: string;
           accuracy_meters: number | null;
           client_created_at: string;
           created_at: string;
+          family_code: string | null;
+          family_id: string | null;
+          house_id: string | null;
           id: string;
-          latitude: number;
-          longitude: number;
+          latitude: number | null;
+          longitude: number | null;
           note: string | null;
-          phone_number: string;
+          people_count: number | null;
+          phone_number: string | null;
           source: string;
-          status: Database['public']['Enums']['rescue_ping_status'];
+          status: Database['public']['Enums']['report_history_status'];
+          type: Database['public']['Enums']['report_history_type'];
           updated_at: string;
+          water_level: Database['public']['Enums']['water_level'] | null;
         };
         Insert: {
+          access_method: string;
           accuracy_meters?: number | null;
           client_created_at: string;
           created_at?: string;
+          family_code?: string | null;
+          family_id?: string | null;
+          house_id?: string | null;
           id?: string;
-          latitude: number;
-          longitude: number;
+          latitude?: number | null;
+          longitude?: number | null;
           note?: string | null;
-          phone_number: string;
+          people_count?: number | null;
+          phone_number?: string | null;
           source?: string;
-          status?: Database['public']['Enums']['rescue_ping_status'];
+          status?: Database['public']['Enums']['report_history_status'];
+          type: Database['public']['Enums']['report_history_type'];
           updated_at?: string;
+          water_level?: Database['public']['Enums']['water_level'] | null;
         };
         Update: {
+          access_method?: string;
           accuracy_meters?: number | null;
           client_created_at?: string;
           created_at?: string;
+          family_code?: string | null;
+          family_id?: string | null;
+          house_id?: string | null;
           id?: string;
-          latitude?: number;
-          longitude?: number;
+          latitude?: number | null;
+          longitude?: number | null;
           note?: string | null;
-          phone_number?: string;
+          people_count?: number | null;
+          phone_number?: string | null;
           source?: string;
-          status?: Database['public']['Enums']['rescue_ping_status'];
+          status?: Database['public']['Enums']['report_history_status'];
+          type?: Database['public']['Enums']['report_history_type'];
           updated_at?: string;
+          water_level?: Database['public']['Enums']['water_level'] | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'report_histories_family_id_fkey';
+            columns: ['family_id'];
+            isOneToOne: false;
+            referencedRelation: 'families';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'report_histories_house_id_fkey';
+            columns: ['house_id'];
+            isOneToOne: false;
+            referencedRelation: 'houses';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      sessions: {
+        Row: {
+          created_at: string;
+          id: string;
+          refresh_token: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          refresh_token: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          refresh_token?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'sessions_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      users: {
+        Row: {
+          created_at: string;
+          email: string;
+          id: string;
+          name: string | null;
+          password_hash: string;
+          updated_at: string;
+          username: string;
+        };
+        Insert: {
+          created_at?: string;
+          email: string;
+          id?: string;
+          name?: string | null;
+          password_hash: string;
+          updated_at?: string;
+          username: string;
+        };
+        Update: {
+          created_at?: string;
+          email?: string;
+          id?: string;
+          name?: string | null;
+          password_hash?: string;
+          updated_at?: string;
+          username?: string;
         };
         Relationships: [];
       };
@@ -596,7 +694,8 @@ export type Database = {
         | 'Community Center'
         | 'Other';
       house_status: 'Not Checked' | 'Safe' | 'Needs Assistance' | 'Needs Rescue' | 'Evacuated';
-      rescue_ping_status: 'New' | 'Acknowledged' | 'Responding' | 'Resolved';
+      report_history_status: 'New' | 'Acknowledged' | 'Responding' | 'Resolved';
+      report_history_type: 'Flood Report' | 'Rescue Request';
       resident_status:
         | 'Inside House'
         | 'Evacuated'
@@ -762,7 +861,8 @@ export const Constants = {
         'Other',
       ],
       house_status: ['Not Checked', 'Safe', 'Needs Assistance', 'Needs Rescue', 'Evacuated'],
-      rescue_ping_status: ['New', 'Acknowledged', 'Responding', 'Resolved'],
+      report_history_status: ['New', 'Acknowledged', 'Responding', 'Resolved'],
+      report_history_type: ['Flood Report', 'Rescue Request'],
       resident_status: [
         'Inside House',
         'Evacuated',

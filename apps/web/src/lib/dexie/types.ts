@@ -1,31 +1,31 @@
-export type RescuePriority = 'critical' | 'high' | 'medium' | 'low';
-export type RescueStatus = 'new' | 'triaged' | 'responding' | 'resolved';
+import type { PublicTableRow } from '@/data';
 
-export type RescueReport = {
+export type ReportHistory = PublicTableRow<'report_histories'>;
+export type ReportHistoryType = ReportHistory['type'];
+export type ReportHistoryWaterLevel = ReportHistory['water_level'];
+export type ResidentAccessMethod = 'scan' | 'upload' | 'manual';
+
+export type ReportHistoryOutboxAction = 'insert_report_history';
+export type ReportHistoryOutboxStatus = 'queued' | 'sending' | 'sent' | 'failed';
+
+export type ReportHistoryOutbox = {
   id: string;
-  household: string;
-  location: string;
-  priority: RescuePriority;
-  status: RescueStatus;
-  people: number;
-  notes: string;
-  createdAt: number;
+  report_history_id: string;
+  family_code: string | null;
+  action: ReportHistoryOutboxAction;
+  status: ReportHistoryOutboxStatus;
+  attempt_count: number;
+  last_error: string | null;
+  synced_at: string | null;
+  created_at: string;
+  updated_at: string;
 };
 
-export type RescuePingSyncStatus = 'queued' | 'sending' | 'sent' | 'failed';
-
-export type RescuePing = {
-  id: string;
-  phoneNumber: string;
-  latitude: number;
-  longitude: number;
-  accuracyMeters: number | null;
-  note: string;
-  syncStatus: RescuePingSyncStatus;
-  retryCount: number;
-  lastSyncError: string | null;
-  syncedAt: number | null;
-  createdAt: number;
+export type ReportHistoryWithOutboxState = ReportHistory & {
+  outbox_status: ReportHistoryOutboxStatus;
+  outbox_attempt_count: number;
+  outbox_last_error: string | null;
+  outbox_synced_at: string | null;
 };
 
 export type FloodRiskLevel = 'low' | 'medium' | 'high' | 'critical' | 'unknown';

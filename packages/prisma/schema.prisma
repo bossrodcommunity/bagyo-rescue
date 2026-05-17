@@ -110,13 +110,45 @@ enum EvacuationAssignmentStatus {
   @@map("evacuation_assignment_status")
 }
 
-enum RescuePingStatus {
+enum ReportHistoryType {
+  FLOOD_REPORT   @map("Flood Report")
+  RESCUE_REQUEST @map("Rescue Request")
+
+  @@map("report_history_type")
+}
+
+enum ReportHistoryStatus {
   NEW          @map("New")
   ACKNOWLEDGED @map("Acknowledged")
   RESPONDING   @map("Responding")
   RESOLVED     @map("Resolved")
 
-  @@map("rescue_ping_status")
+  @@map("report_history_status")
+}
+
+model User {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email         String    @unique
+  username      String    @unique
+  name          String?
+  password_hash String
+  created_at    DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+  sessions      Session[]
+
+  @@map("users")
+}
+
+model Session {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id       String   @db.Uuid
+  refresh_token String   @unique
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  user          User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@map("sessions")
 }
 
 model Lgu {
@@ -149,21 +181,22 @@ model Barangay {
 }
 
 model House {
-  id              String                       @id @default(dbgenerated("concat('house_', replace((gen_random_uuid())::text, '-'::text, ''::text))"))
-  barangay_id     String
-  address         String
-  landmark        String?
-  latitude        Decimal?                     @db.Decimal(9, 6)
-  longitude       Decimal?                     @db.Decimal(9, 6)
-  current_status  HouseStatus                  @default(NOT_CHECKED)
-  water_level     WaterLevel                   @default(UNKNOWN)
-  last_checked_at DateTime?                    @db.Timestamptz(6)
-  last_checked_by String?
-  created_at      DateTime                     @default(now()) @db.Timestamptz(6)
-  updated_at      DateTime                     @default(now()) @updatedAt @db.Timestamptz(6)
-  barangay        Barangay                     @relation(fields: [barangay_id], references: [id], onDelete: Cascade)
-  families        Family[]
-  assignments     EvacuationCenterAssignment[]
+  id               String                       @id @default(dbgenerated("concat('house_', replace((gen_random_uuid())::text, '-'::text, ''::text))"))
+  barangay_id      String
+  address          String
+  landmark         String?
+  latitude         Decimal?                     @db.Decimal(9, 6)
+  longitude        Decimal?                     @db.Decimal(9, 6)
+  current_status   HouseStatus                  @default(NOT_CHECKED)
+  water_level      WaterLevel                   @default(UNKNOWN)
+  last_checked_at  DateTime?                    @db.Timestamptz(6)
+  last_checked_by  String?
+  created_at       DateTime                     @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime                     @default(now()) @updatedAt @db.Timestamptz(6)
+  barangay         Barangay                     @relation(fields: [barangay_id], references: [id], onDelete: Cascade)
+  families         Family[]
+  assignments      EvacuationCenterAssignment[]
+  report_histories ReportHistory[]
 
   @@index([barangay_id])
   @@index([current_status])
@@ -190,6 +223,7 @@ model Family {
   house                         House                        @relation(fields: [house_id], references: [id], onDelete: Cascade)
   residents                     Resident[]
   evacuation_center_assignments EvacuationCenterAssignment[]
+  report_histories              ReportHistory[]
 
   @@index([house_id])
   @@index([needs_assistance])
@@ -295,19 +329,19 @@ model EvacuationCenterAssignment {
 }
 
 model FloodReport {
-  id             String    @id @default(dbgenerated("concat('flood_report_', replace((gen_random_uuid())::text, '-'::text, ''::text))"))
-  clientReportId String    @unique @map("client_report_id")
-  latitude       Decimal?  @db.Decimal(9, 6)
-  longitude      Decimal?  @db.Decimal(9, 6)
-  accuracy       Decimal?  @db.Decimal(10, 2)
+  id             String   @id @default(dbgenerated("concat('flood_report_', replace((gen_random_uuid())::text, '-'::text, ''::text))"))
+  clientReportId String   @unique @map("client_report_id")
+  latitude       Decimal? @db.Decimal(9, 6)
+  longitude      Decimal? @db.Decimal(9, 6)
+  accuracy       Decimal? @db.Decimal(10, 2)
   barangay       String?
-  riskLevel      String    @map("risk_level")
+  riskLevel      String   @map("risk_level")
   confidence     String
   status         String
-  reportedAt     DateTime  @map("reported_at") @db.Timestamptz(6)
-  expiresAt      DateTime  @map("expires_at") @db.Timestamptz(6)
-  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt      DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  reportedAt     DateTime @map("reported_at") @db.Timestamptz(6)
+  expiresAt      DateTime @map("expires_at") @db.Timestamptz(6)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@index([riskLevel])
   @@index([status])
@@ -315,20 +349,32 @@ model FloodReport {
   @@map("flood_reports")
 }
 
-model RescuePing {
-  id                String           @id @default(dbgenerated("concat('ping_', replace((gen_random_uuid())::text, '-'::text, ''::text))"))
-  phone_number      String
-  latitude          Decimal          @db.Decimal(9, 6)
-  longitude         Decimal          @db.Decimal(9, 6)
-  accuracy_meters   Decimal?         @db.Decimal(10, 2)
+model ReportHistory {
+  id                String              @id @default(dbgenerated("concat('report_', replace((gen_random_uuid())::text, '-'::text, ''::text))"))
+  type              ReportHistoryType
+  family_id         String?
+  house_id          String?
+  family_code       String?
+  access_method     String
+  phone_number      String?
+  latitude          Decimal?            @db.Decimal(9, 6)
+  longitude         Decimal?            @db.Decimal(9, 6)
+  accuracy_meters   Decimal?            @db.Decimal(10, 2)
+  water_level       WaterLevel?
+  people_count      Int?
   note              String?
-  source            String           @default("web")
-  status            RescuePingStatus @default(NEW)
-  client_created_at DateTime         @db.Timestamptz(6)
-  created_at        DateTime         @default(now()) @db.Timestamptz(6)
-  updated_at        DateTime         @default(now()) @updatedAt @db.Timestamptz(6)
+  source            String              @default("web")
+  status            ReportHistoryStatus @default(NEW)
+  client_created_at DateTime            @db.Timestamptz(6)
+  created_at        DateTime            @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
+  family            Family?             @relation(fields: [family_id], references: [id], onDelete: SetNull)
+  house             House?              @relation(fields: [house_id], references: [id], onDelete: SetNull)
 
+  @@index([type])
   @@index([status])
+  @@index([family_id])
+  @@index([house_id])
   @@index([created_at])
-  @@map("rescue_pings")
+  @@map("report_histories")
 }

@@ -1,33 +1,38 @@
-export { dexie, createDexieClient, type BagyoRescueDexie } from './client';
+export { createDexieClient, dexie, type BagyoRescueDexie } from './client';
 export {
-  addFloodReport,
-  getFloodOutboxSummary,
-  listFloodReports,
-  type FloodReportSyncStatus,
-  type FloodReportWithSyncStatus,
+    addFloodReport,
+    getFloodOutboxSummary,
+    listFloodReports,
+    type FloodReportSyncStatus,
+    type FloodReportWithSyncStatus
 } from './flood-reports';
-export { addReport, listReports, seedReports, updateReportStatus } from './reports';
 export {
-  addRescuePing,
-  getRescuePing,
-  listRescuePings,
-  listRescuePingsForSync,
-  updateRescuePingSyncState,
-  type AddRescuePingInput,
-} from './rescue-pings';
+    addReportHistory,
+    getReportHistory,
+    getReportHistoryWithOutboxState,
+    linkPendingReportHistoriesToAccess,
+    listReportHistoriesWithOutboxState,
+    listReportHistoryOutboxForSync,
+    updateReportHistoryOutboxState,
+    type AddReportHistoryInput,
+    type LinkPendingReportHistoriesToAccessInput,
+    type ListReportHistoriesWithOutboxStateInput,
+    type ListReportHistoryOutboxForSyncInput
+} from './report-histories';
 export { dexieSchema } from './schema';
 export type {
-  AddFloodReportInput,
-  RescuePing,
-  FloodOutboxItem,
-  FloodOutboxItemStatus,
-  FloodOutboxItemType,
-  FloodReport,
-  FloodReportConfidence,
-  FloodReportStatus,
-  FloodRiskLevel,
-  RescuePingSyncStatus,
-  RescuePriority,
-  RescueReport,
-  RescueStatus,
+    AddFloodReportInput,
+    FloodOutboxItem,
+    FloodOutboxItemStatus,
+    FloodOutboxItemType,
+    FloodReport,
+    FloodReportConfidence,
+    FloodReportStatus,
+    FloodRiskLevel,
+    ReportHistory,
+    ReportHistoryOutbox,
+    ReportHistoryOutboxAction,
+    ReportHistoryOutboxStatus,
+    ReportHistoryType, ReportHistoryWaterLevel, ReportHistoryWithOutboxState, ResidentAccessMethod
 } from './types';
+

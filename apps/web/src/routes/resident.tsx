@@ -143,7 +143,7 @@ function ResidentPortalPage() {
     <Page className="flex flex-col gap-10">
       <section aria-label="Emergency" className="flex flex-col gap-2.5">
         <SosButton asChild>
-          <Link to="/reports" />
+          <Link to="/request-rescue" />
         </SosButton>
         <p className="text-label-md text-muted-foreground">
           Pindutin para humingi ng tulong ngayon. Tap to request rescue now.
