@@ -48,6 +48,26 @@ export type LinkPendingReportHistoriesToAccessInput = {
   people_count?: number | null;
 };
 
+export type UpdateReportHistoryInput = {
+  id: string;
+  payload: Partial<
+    Pick<
+      ReportHistory,
+      | 'phone_number'
+      | 'latitude'
+      | 'longitude'
+      | 'accuracy_meters'
+      | 'water_level'
+      | 'people_count'
+      | 'note'
+    >
+  >;
+};
+
+export type DeleteReportHistoryInput = {
+  id: string;
+};
+
 function createReportHistoryId() {
   return `report_${crypto.randomUUID().replaceAll('-', '')}`;
 }
@@ -255,6 +275,49 @@ export async function linkPendingReportHistoriesToAccess({
   });
 
   return { linked };
+}
+
+export async function updateReportHistory({ id, payload }: UpdateReportHistoryInput) {
+  const now = new Date().toISOString();
+  const reportHistory = await getReportHistory(id);
+
+  if (!reportHistory) {
+    throw new Error('Report was not found on this device.');
+  }
+
+  await dexie.transaction('rw', dexie.reportHistories, dexie.reportHistoryOutbox, async () => {
+    await dexie.reportHistories.update(id, {
+      ...payload,
+      updated_at: now,
+    });
+
+    const outbox = await dexie.reportHistoryOutbox.where('report_history_id').equals(id).first();
+
+    if (outbox && outbox.status !== 'sent') {
+      await dexie.reportHistoryOutbox.update(outbox.id, {
+        status: 'queued',
+        last_error: null,
+        updated_at: now,
+      });
+    }
+  });
+
+  const updatedReportHistory = await getReportHistoryWithOutboxState(id);
+
+  if (!updatedReportHistory) {
+    throw new Error('Updated report was not found on this device.');
+  }
+
+  return updatedReportHistory;
+}
+
+export async function deleteReportHistory({ id }: DeleteReportHistoryInput) {
+  await dexie.transaction('rw', dexie.reportHistories, dexie.reportHistoryOutbox, async () => {
+    await dexie.reportHistoryOutbox.where('report_history_id').equals(id).delete();
+    await dexie.reportHistories.delete(id);
+  });
+
+  return { id };
 }
 
 export async function updateReportHistoryOutboxState({

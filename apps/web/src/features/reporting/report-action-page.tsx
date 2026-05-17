@@ -2,23 +2,25 @@ import {
   IconAlertTriangle,
   IconCheck,
   IconCurrentLocation,
-  IconKey,
+  IconDeviceFloppy,
+  IconEdit,
   IconMapPin,
   IconRefresh,
   IconSend,
-  IconShieldCheck,
+  IconTrash,
+  IconX,
 } from '@tabler/icons-react';
-import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
-import { ResidentAccessPanel } from '@/features/resident/resident-access-gate';
+import { useMemo, useState, type FormEvent } from 'react';
 import {
   type ResidentAccessSession,
   useResidentAccessSession,
 } from '@/features/resident/resident-access-session';
 import {
-  useLinkPendingReportHistoriesToAccessMutation,
+  useDeleteReportHistoryMutation,
   useReportHistoriesQuery,
   useSubmitReportHistoryMutation,
   useSyncReportHistoriesMutation,
+  useUpdateReportHistoryMutation,
 } from '@/hooks/query/report-histories';
 import { Constants } from '@/lib/supabase/types';
 import type {
@@ -48,7 +50,7 @@ type ReportActionPageProps = {
 
 export function ReportActionPage({ type }: ReportActionPageProps) {
   const isFloodReport = type === 'Flood Report';
-  const { access, setAccess, endSession } = useResidentAccessSession();
+  const { access } = useResidentAccessSession();
 
   return (
     <Page width="narrow" className="flex flex-col gap-6 pb-24 pt-6 sm:pt-10">
@@ -66,81 +68,8 @@ export function ReportActionPage({ type }: ReportActionPageProps) {
         </div>
       </PageHeader>
 
-      <FamilyAccessSection access={access} endSession={endSession} onAuthenticated={setAccess} />
       <ReportForm type={type} access={access} />
     </Page>
-  );
-}
-
-function FamilyAccessSection({
-  access,
-  endSession,
-  onAuthenticated,
-}: {
-  access: ResidentAccessSession | null;
-  endSession: () => void;
-  onAuthenticated: (access: ResidentAccessSession) => void;
-}) {
-  const [isAddingAccess, setIsAddingAccess] = useState(false);
-
-  if (access) {
-    return (
-      <div className="flex items-center justify-between gap-3 rounded-md border border-border bg-safe-soft p-4">
-        <div className="flex min-w-0 items-center gap-3">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-safe text-text-on-safe">
-            <IconShieldCheck aria-hidden="true" className="size-5" />
-          </span>
-          <div className="flex min-w-0 flex-col">
-            <span className="truncate text-body-md font-medium text-foreground">
-              {access.session.family.family_code}
-            </span>
-            <span className="truncate text-label-md text-muted-foreground">
-              {access.session.family.family_name}
-            </span>
-          </div>
-        </div>
-        <Button type="button" variant="ghost" size="sm" onClick={endSession}>
-          Unlink
-        </Button>
-      </div>
-    );
-  }
-
-  return (
-    <section className="flex flex-col gap-3 rounded-md border border-border bg-surface p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex gap-3">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-primary-soft text-primary">
-            <IconKey aria-hidden="true" className="size-5" />
-          </span>
-          <div className="flex flex-col gap-1">
-            <h2 className="text-body-md font-semibold text-foreground">Family code optional</h2>
-            <p className="text-label-md text-muted-foreground">
-              File now without a code. Add your family code and PIN later to sync pending reports.
-            </p>
-          </div>
-        </div>
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          onClick={() => setIsAddingAccess(value => !value)}
-        >
-          {isAddingAccess ? 'Close' : 'Add'}
-        </Button>
-      </div>
-
-      {isAddingAccess ? (
-        <ResidentAccessPanel
-          title="Link family"
-          description="Scan QR, upload QR, or enter family code and PIN. Pending local reports will sync after this."
-          onAuthenticated={nextAccess => {
-            onAuthenticated(nextAccess);
-            setIsAddingAccess(false);
-          }}
-        />
-      ) : null}
-    </section>
   );
 }
 
@@ -155,13 +84,11 @@ function ReportForm({
   const reportHistoriesQuery = useReportHistoriesQuery({ type });
   const submitReportHistory = useSubmitReportHistoryMutation();
   const syncReportHistories = useSyncReportHistoriesMutation();
-  const linkPendingReportHistories = useLinkPendingReportHistoriesToAccessMutation();
   const [capturedLocation, setCapturedLocation] = useState<CapturedLocation | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [isLocating, setIsLocating] = useState(false);
-  const syncedAccessFamilyCodeRef = useRef<string | null>(null);
 
   const reportHistories = reportHistoriesQuery.data ?? [];
   const queuedCount = useMemo(
@@ -169,45 +96,6 @@ function ReportForm({
     [reportHistories]
   );
   const isFloodReport = type === 'Flood Report';
-
-  useEffect(() => {
-    if (!access) {
-      syncedAccessFamilyCodeRef.current = null;
-      return;
-    }
-
-    if (!isOnline) {
-      syncedAccessFamilyCodeRef.current = null;
-      return;
-    }
-
-    if (
-      syncedAccessFamilyCodeRef.current === access.session.family.family_code ||
-      linkPendingReportHistories.isPending ||
-      syncReportHistories.isPending
-    ) {
-      return;
-    }
-
-    syncedAccessFamilyCodeRef.current = access.session.family.family_code;
-    linkPendingReportHistories.mutate(
-      {
-        payload: {
-          family_id: access.session.family.id,
-          house_id: access.session.house.id,
-          family_code: access.session.family.family_code,
-          access_method: access.accessMethod,
-          phone_number: access.session.family.head_of_family_phone_number,
-          people_count: access.session.family.total_members,
-        },
-      },
-      {
-        onSuccess: () => {
-          syncReportHistories.mutate({ family_code: access.session.family.family_code });
-        },
-      }
-    );
-  }, [access, isOnline, linkPendingReportHistories, syncReportHistories]);
 
   async function handleLocate() {
     setLocationError(null);
@@ -424,27 +312,12 @@ function ReportForm({
                 type="button"
                 size="lg"
                 variant="ghost"
-                isLoading={linkPendingReportHistories.isPending || syncReportHistories.isPending}
+                isLoading={syncReportHistories.isPending}
                 loadingLabel="Syncing..."
                 onClick={() => {
-                  linkPendingReportHistories.mutate(
-                    {
-                      payload: {
-                        family_id: access.session.family.id,
-                        house_id: access.session.house.id,
-                        family_code: access.session.family.family_code,
-                        access_method: access.accessMethod,
-                        phone_number: access.session.family.head_of_family_phone_number,
-                        people_count: access.session.family.total_members,
-                      },
-                    },
-                    {
-                      onSuccess: () =>
-                        syncReportHistories.mutate({
-                          family_code: access.session.family.family_code,
-                        }),
-                    }
-                  );
+                  syncReportHistories.mutate({
+                    family_code: access.session.family.family_code,
+                  });
                 }}
               >
                 <IconRefresh aria-hidden="true" />
@@ -477,20 +350,64 @@ function ReportForm({
 }
 
 function LocationPreview({ location }: { location: CapturedLocation }) {
+  return <CoordinatePreview location={location} title="GPS captured" />;
+}
+
+type CoordinatePreviewLocation = Pick<CapturedLocation, 'latitude' | 'longitude'> & {
+  accuracyMeters?: number | null;
+};
+
+function CoordinatePreview({
+  location,
+  title = 'Location preview',
+  compact = false,
+}: {
+  location: CoordinatePreviewLocation;
+  title?: string;
+  compact?: boolean;
+}) {
+  const isOnline = useOnlineStatus();
+  const accuracyLabel =
+    location.accuracyMeters !== undefined && location.accuracyMeters !== null
+      ? ` · ±${Math.round(location.accuracyMeters)}m`
+      : '';
+
   return (
-    <div className="flex flex-col gap-3 rounded-md border border-border bg-surface-sunken p-4">
+    <div
+      className={cn(
+        'flex flex-col gap-3 rounded-md border border-border bg-surface-sunken',
+        compact ? 'p-3' : 'p-4'
+      )}
+    >
+      {isOnline ? (
+        <iframe
+          title={`${title}: ${formatCoordinate(location.latitude)}, ${formatCoordinate(
+            location.longitude
+          )}`}
+          src={buildMapsEmbedUrl(location)}
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          className={cn(
+            'w-full rounded-md border border-border bg-surface-sunken',
+            compact ? 'h-44' : 'h-64'
+          )}
+        />
+      ) : (
+        <LocalCoordinatePreviewMap location={location} title={title} compact={compact} />
+      )}
+
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex min-w-0 flex-col gap-1">
           <span className="inline-flex items-center gap-2 text-body-md font-medium text-foreground">
             <span aria-hidden="true" className="inline-block size-2 rounded-full bg-safe" />
-            GPS captured
+            {title}
           </span>
           <p className="text-label-md text-muted-foreground">
             {formatCoordinate(location.latitude)}, {formatCoordinate(location.longitude)}
-            {location.accuracyMeters !== null ? ` · ±${Math.round(location.accuracyMeters)}m` : ''}
+            {accuracyLabel}
           </p>
         </div>
-        <Button asChild variant="ghost" size="sm">
+        <Button asChild variant="ghost" size={compact ? 'sm' : 'md'}>
           <a href={buildMapsUrl(location)} target="_blank" rel="noreferrer">
             <IconMapPin aria-hidden="true" />
             Open map
@@ -501,11 +418,68 @@ function LocationPreview({ location }: { location: CapturedLocation }) {
   );
 }
 
+function LocalCoordinatePreviewMap({
+  location,
+  title,
+  compact,
+}: {
+  location: CoordinatePreviewLocation;
+  title: string;
+  compact: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        'relative overflow-hidden rounded-md border border-border bg-primary-soft',
+        compact ? 'h-44' : 'h-64'
+      )}
+      aria-label={`${title}: ${formatCoordinate(location.latitude)}, ${formatCoordinate(
+        location.longitude
+      )}`}
+    >
+      <div className="absolute inset-0 grid grid-cols-4 grid-rows-3">
+        {Array.from({ length: 12 }).map((_, index) => (
+          <span key={index} className="border-r border-b border-primary/10" aria-hidden="true" />
+        ))}
+      </div>
+      <span
+        aria-hidden="true"
+        className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-primary/20"
+      />
+      <span
+        aria-hidden="true"
+        className="absolute left-0 top-1/2 h-px w-full -translate-y-1/2 bg-primary/20"
+      />
+      <span
+        aria-hidden="true"
+        className="absolute left-1/2 top-1/2 flex size-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-primary/20 bg-surface/90 text-primary shadow-raised"
+      >
+        <IconMapPin className="size-6" />
+      </span>
+      <span className="absolute bottom-2 left-2 rounded-md bg-surface/95 px-2 py-1 text-caption text-muted-foreground shadow-raised">
+        {formatCoordinate(location.latitude)}, {formatCoordinate(location.longitude)}
+      </span>
+    </div>
+  );
+}
+
 function ReportHistoryItem({ reportHistory }: { reportHistory: ReportHistoryWithOutboxState }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const deleteReportHistory = useDeleteReportHistoryMutation();
   const needsFamilyAccess = !reportHistory.family_code && reportHistory.outbox_status !== 'sent';
+  const canEdit = reportHistory.outbox_status !== 'sent';
+  const reportLocation =
+    reportHistory.latitude !== null && reportHistory.longitude !== null
+      ? {
+          latitude: reportHistory.latitude,
+          longitude: reportHistory.longitude,
+          accuracyMeters: reportHistory.accuracy_meters,
+        }
+      : null;
 
   return (
-    <li className="rounded-md border border-border bg-surface p-4">
+    <li className="flex flex-col gap-3 rounded-md border border-border bg-surface p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 flex-col gap-1.5">
           <span className="text-body-md font-medium text-foreground">
@@ -515,23 +489,6 @@ function ReportHistoryItem({ reportHistory }: { reportHistory: ReportHistoryWith
             {reportHistory.people_count ?? 0} people · {formatTimeSince(reportHistory.created_at)}{' '}
             ago
           </span>
-          {reportHistory.latitude !== null && reportHistory.longitude !== null ? (
-            <a
-              href={buildMapsUrl({
-                latitude: reportHistory.latitude,
-                longitude: reportHistory.longitude,
-              })}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 text-label-md text-primary hover:underline"
-            >
-              <IconMapPin aria-hidden="true" className="size-4" />
-              <span className="truncate">
-                {formatCoordinate(reportHistory.latitude)},{' '}
-                {formatCoordinate(reportHistory.longitude)}
-              </span>
-            </a>
-          ) : null}
           {reportHistory.outbox_last_error ? (
             <span className="text-caption text-danger">{reportHistory.outbox_last_error}</span>
           ) : null}
@@ -541,7 +498,288 @@ function ReportHistoryItem({ reportHistory }: { reportHistory: ReportHistoryWith
           needsFamilyAccess={needsFamilyAccess}
         />
       </div>
+      {isEditing ? (
+        <ReportHistoryEditForm
+          reportHistory={reportHistory}
+          onCancel={() => setIsEditing(false)}
+          onSaved={() => setIsEditing(false)}
+        />
+      ) : reportLocation ? (
+        <CoordinatePreview location={reportLocation} title="Saved location" compact />
+      ) : null}
+      {!isEditing ? (
+        <div className="grid grid-cols-2 gap-2 border-t border-border pt-3">
+          {canEdit ? (
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                setIsConfirmingDelete(false);
+                setIsEditing(true);
+              }}
+            >
+              <IconEdit aria-hidden="true" />
+              Edit
+            </Button>
+          ) : (
+            <span className="flex items-center text-caption text-muted-foreground">
+              Sent reports are locked.
+            </span>
+          )}
+          {isConfirmingDelete ? (
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                disabled={deleteReportHistory.isPending}
+                onClick={() => setIsConfirmingDelete(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="danger"
+                size="sm"
+                isLoading={deleteReportHistory.isPending}
+                loadingLabel="Deleting..."
+                onClick={() => {
+                  deleteReportHistory.mutate({
+                    payload: { id: reportHistory.id },
+                  });
+                }}
+              >
+                Delete
+              </Button>
+            </div>
+          ) : (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={deleteReportHistory.isPending}
+              onClick={() => setIsConfirmingDelete(true)}
+            >
+              <IconTrash aria-hidden="true" />
+              Delete
+            </Button>
+          )}
+        </div>
+      ) : null}
     </li>
+  );
+}
+
+function ReportHistoryEditForm({
+  reportHistory,
+  onCancel,
+  onSaved,
+}: {
+  reportHistory: ReportHistoryWithOutboxState;
+  onCancel: () => void;
+  onSaved: () => void;
+}) {
+  const updateReportHistory = useUpdateReportHistoryMutation();
+  const isFloodReport = reportHistory.type === 'Flood Report';
+  const [editLocation, setEditLocation] = useState<CapturedLocation | null>(() =>
+    reportHistory.latitude !== null && reportHistory.longitude !== null
+      ? {
+          latitude: reportHistory.latitude,
+          longitude: reportHistory.longitude,
+          accuracyMeters: reportHistory.accuracy_meters,
+        }
+      : null
+  );
+  const [isLocating, setIsLocating] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
+
+  async function handleLocate() {
+    setLocationError(null);
+    setEditError(null);
+    setIsLocating(true);
+
+    try {
+      setEditLocation(await getCurrentLocation());
+    } catch (error) {
+      setLocationError(error instanceof Error ? error.message : 'Hindi makuha ang GPS.');
+    } finally {
+      setIsLocating(false);
+    }
+  }
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setEditError(null);
+
+    const form = new FormData(event.currentTarget);
+    const phoneNumber = normalizePhoneNumber(String(form.get('phoneNumber') ?? ''));
+    const peopleCount = Number(form.get('peopleCount') ?? 0);
+    const note = String(form.get('note') ?? '').trim();
+    const waterLevel = (String(form.get('waterLevel') ?? '') ||
+      null) as ReportHistoryWaterLevel | null;
+
+    if (phoneNumber && !isValidPhoneNumber(phoneNumber)) {
+      setEditError('Ilagay ang tamang phone number.');
+      return;
+    }
+
+    if (!Number.isFinite(peopleCount) || peopleCount < 0) {
+      setEditError('Ilagay ang tamang bilang ng tao.');
+      return;
+    }
+
+    if (!isFloodReport && !editLocation) {
+      setEditError('Kunin muna ang GPS location.');
+      return;
+    }
+
+    updateReportHistory.mutate(
+      {
+        payload: {
+          id: reportHistory.id,
+          payload: {
+            phone_number: phoneNumber || null,
+            people_count: peopleCount,
+            note: note || null,
+            water_level: isFloodReport ? waterLevel : null,
+            latitude: editLocation?.latitude ?? null,
+            longitude: editLocation?.longitude ?? null,
+            accuracy_meters: editLocation?.accuracyMeters ?? null,
+          },
+        },
+      },
+      {
+        onSuccess: onSaved,
+        onError: error => {
+          setEditError(error instanceof Error ? error.message : 'Hindi nai-save ang changes.');
+        },
+      }
+    );
+  }
+
+  return (
+    <form
+      className="flex flex-col gap-4 rounded-md border border-border bg-surface-sunken p-3"
+      onSubmit={handleSubmit}
+    >
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-body-md font-semibold text-foreground">Edit report</h3>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          disabled={updateReportHistory.isPending}
+          onClick={onCancel}
+        >
+          <IconX aria-hidden="true" />
+          Close
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <Label htmlFor={`edit-phone-${reportHistory.id}`} className="sm:col-span-2">
+          Phone number
+          <Input
+            id={`edit-phone-${reportHistory.id}`}
+            name="phoneNumber"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            defaultValue={reportHistory.phone_number ?? ''}
+            placeholder="09xx xxx xxxx"
+          />
+        </Label>
+
+        <Label htmlFor={`edit-people-${reportHistory.id}`}>
+          People affected
+          <Input
+            id={`edit-people-${reportHistory.id}`}
+            name="peopleCount"
+            type="number"
+            inputMode="numeric"
+            min={0}
+            defaultValue={reportHistory.people_count ?? 0}
+            required
+          />
+        </Label>
+
+        {isFloodReport ? (
+          <Label htmlFor={`edit-water-${reportHistory.id}`}>
+            Water level
+            <Select
+              id={`edit-water-${reportHistory.id}`}
+              name="waterLevel"
+              defaultValue={reportHistory.water_level ?? Constants.public.Enums.water_level[0]}
+            >
+              {Constants.public.Enums.water_level.map(level => (
+                <option key={level} value={level}>
+                  {level}
+                </option>
+              ))}
+            </Select>
+          </Label>
+        ) : null}
+
+        <Label htmlFor={`edit-note-${reportHistory.id}`} className="sm:col-span-2">
+          Note
+          <Textarea
+            id={`edit-note-${reportHistory.id}`}
+            name="note"
+            defaultValue={reportHistory.note ?? ''}
+          />
+        </Label>
+      </div>
+
+      <Button
+        type="button"
+        variant="secondary"
+        size="md"
+        className="w-full justify-center"
+        isLoading={isLocating}
+        loadingLabel="Kinukuha ang GPS..."
+        onClick={handleLocate}
+      >
+        <IconCurrentLocation aria-hidden="true" />
+        Update GPS location
+      </Button>
+
+      {editLocation ? (
+        <CoordinatePreview location={editLocation} title="Edited location" compact />
+      ) : null}
+      {locationError ? (
+        <Alert tone="danger">
+          <AlertBody>{locationError}</AlertBody>
+        </Alert>
+      ) : null}
+      {editError ? (
+        <Alert tone="danger">
+          <AlertBody>{editError}</AlertBody>
+        </Alert>
+      ) : null}
+
+      <div className="grid grid-cols-2 gap-2">
+        <Button
+          type="button"
+          variant="ghost"
+          size="md"
+          disabled={updateReportHistory.isPending}
+          onClick={onCancel}
+        >
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          size="md"
+          isLoading={updateReportHistory.isPending}
+          loadingLabel="Saving..."
+        >
+          <IconDeviceFloppy aria-hidden="true" />
+          Save
+        </Button>
+      </div>
+    </form>
   );
 }
 
@@ -649,6 +887,12 @@ function formatCoordinate(value: number) {
 
 function buildMapsUrl(location: Pick<CapturedLocation, 'latitude' | 'longitude'>) {
   return `https://www.google.com/maps?q=${location.latitude},${location.longitude}`;
+}
+
+function buildMapsEmbedUrl(location: Pick<CapturedLocation, 'latitude' | 'longitude'>) {
+  const query = encodeURIComponent(`${location.latitude},${location.longitude}`);
+
+  return `https://maps.google.com/maps?q=${query}&z=16&output=embed`;
 }
 
 function formatTimeSince(timestamp: string) {

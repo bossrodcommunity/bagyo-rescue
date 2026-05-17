@@ -6,6 +6,10 @@ type LabelProps = React.ComponentProps<'label'> & {
 };
 
 function Label({ className, children, hint, ...props }: LabelProps) {
+  const childItems = React.Children.toArray(children);
+  const labelContent = childItems.filter(child => typeof child === 'string');
+  const fieldContent = childItems.filter(child => typeof child !== 'string');
+
   return (
     <label
       data-slot="label"
@@ -13,9 +17,10 @@ function Label({ className, children, hint, ...props }: LabelProps) {
       {...props}
     >
       <span className="flex items-baseline justify-between gap-3">
-        <span className="font-medium">{children}</span>
+        <span className="font-medium">{labelContent}</span>
         {hint ? <span className="text-caption text-muted-foreground">{hint}</span> : null}
       </span>
+      {fieldContent}
     </label>
   );
 }
