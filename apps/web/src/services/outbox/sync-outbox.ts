@@ -112,8 +112,20 @@ function toFloodReportInsert(report: FloodReport) {
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) {
-    return error.message;
+    return getPublicSyncErrorMessage(error.message);
   }
 
   return 'Flood report sync failed.';
+}
+
+function getPublicSyncErrorMessage(message: string) {
+  if (
+    message.includes('SUPABASE_URL') ||
+    message.includes('SUPABASE_ANON_KEY') ||
+    message.includes('Supabase is not configured')
+  ) {
+    return 'Setup needed: online sending is not configured.';
+  }
+
+  return message;
 }

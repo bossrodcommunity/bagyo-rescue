@@ -511,6 +511,25 @@ a:focus-visible {
   margin: 0;
 }
 
+.report-back-link {
+  align-items: center;
+  color: var(--color-text-muted);
+  display: inline-flex;
+  font-size: 0.95rem;
+  font-weight: 800;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.report-back-link svg {
+  height: 20px;
+  width: 20px;
+}
+
+.report-back-link:hover {
+  color: var(--color-primary-pressed);
+}
+
 .toolbar--nearby {
   display: grid;
   gap: 28px 36px;

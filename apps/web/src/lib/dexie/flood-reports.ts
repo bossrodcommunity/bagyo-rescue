@@ -26,7 +26,7 @@ export async function listFloodReports() {
     return {
       ...report,
       syncStatus: getFloodReportSyncStatus(report, outboxItem),
-      syncError: outboxItem?.lastError ?? null,
+      syncError: getPublicSyncErrorMessage(outboxItem?.lastError ?? null),
     };
   });
 }
@@ -69,9 +69,13 @@ export async function getFloodOutboxSummary() {
     .equals('flood-report.create')
     .and(item => item.status !== 'synced')
     .toArray();
+  const failedItems = items
+    .filter(item => item.status === 'failed')
+    .sort((left, right) => right.updatedAt - left.updatedAt);
 
   return {
-    failed: items.filter(item => item.status === 'failed').length,
+    failed: failedItems.length,
+    lastError: getPublicSyncErrorMessage(failedItems[0]?.lastError ?? null),
     pending: items.filter(item => item.status === 'pending').length,
     syncing: items.filter(item => item.status === 'syncing').length,
     total: items.length,
@@ -87,4 +91,18 @@ function getFloodReportSyncStatus(
   if (outboxItem?.status === 'synced' || report.syncedAt) return 'synced';
 
   return 'saved-local';
+}
+
+function getPublicSyncErrorMessage(message: string | null) {
+  if (!message) return null;
+
+  if (
+    message.includes('SUPABASE_URL') ||
+    message.includes('SUPABASE_ANON_KEY') ||
+    message.includes('Supabase is not configured')
+  ) {
+    return 'Setup needed: online sending is not configured.';
+  }
+
+  return message;
 }

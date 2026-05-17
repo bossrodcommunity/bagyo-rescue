@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
+import { IconArrowLeft } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useAddFloodReport } from '../data/use-flood-reports';
 import type { FloodRiskLevel } from '@/lib/dexie';
@@ -49,12 +50,13 @@ function FloodReportPage() {
     <main className="page page--narrow">
       <section className="toolbar">
         <div>
+          <Link to="/bantay-baha" className="report-back-link" aria-label="Back to flood page">
+            <IconArrowLeft aria-hidden="true" />
+            <span>Back</span>
+          </Link>
           <p className="eyebrow">Bagyo Rescue flood report</p>
           <h1>Report flooding here</h1>
         </div>
-        <Link to="/bantay-baha" className="button button--secondary">
-          Back
-        </Link>
       </section>
 
       <section className="report-panel" aria-label="Flood report form">

@@ -1,5 +1,6 @@
 import { Link, Outlet, createRootRouteWithContext, useRouterState } from '@tanstack/react-router';
 import type { QueryClient } from '@tanstack/react-query';
+import { IconRefresh } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useFloodOutboxSummary, useFloodOutboxSyncProcessor } from '../data/use-flood-reports';
 import { Wordmark } from '@/components/brand/wordmark';
@@ -70,14 +71,19 @@ function RootLayout() {
           aria-live="polite"
         >
           <p>{getSyncBannerCopy(online, outboxSummary)}</p>
-          <button
+          <Button
             type="button"
-            className="button--secondary"
+            variant={outboxSummary?.failed ? 'primary' : 'secondary'}
+            size="md"
+            isLoading={syncFloodOutbox.isPending}
+            loadingLabel="Syncing"
+            className="min-h-11 shrink-0 rounded-lg px-5 font-bold text-primary-foreground"
             disabled={!online || syncFloodOutbox.isPending}
             onClick={() => syncFloodOutbox.mutate()}
           >
-            {syncFloodOutbox.isPending ? 'Syncing' : 'Retry sync'}
-          </button>
+            <IconRefresh className="size-4" aria-hidden="true" />
+            Retry sync
+          </Button>
         </section>
       ) : null}
       <Outlet />
@@ -132,7 +138,15 @@ function useOnlineStatus() {
 
 function getSyncBannerCopy(
   online: boolean,
-  outboxSummary: { failed: number; pending: number; syncing: number; total: number } | undefined
+  outboxSummary:
+    | {
+        failed: number;
+        lastError: string | null;
+        pending: number;
+        syncing: number;
+        total: number;
+      }
+    | undefined
 ) {
   if (!online) {
     return 'Offline mode: reports will sync when internet returns.';
@@ -143,12 +157,16 @@ function getSyncBannerCopy(
   }
 
   if (outboxSummary.failed > 0) {
-    return `${outboxSummary.failed} flood report${outboxSummary.failed === 1 ? '' : 's'} waiting to sync. Retry will keep using the local copy.`;
+    if (outboxSummary.lastError) {
+      return `${outboxSummary.failed} flood report${outboxSummary.failed === 1 ? '' : 's'} saved locally. ${outboxSummary.lastError}`;
+    }
+
+    return `${outboxSummary.failed} flood report${outboxSummary.failed === 1 ? '' : 's'} saved locally. Tap Retry sync.`;
   }
 
   if (outboxSummary.syncing > 0) {
     return 'Flood reports are syncing.';
   }
 
-  return `${outboxSummary.pending} flood report${outboxSummary.pending === 1 ? '' : 's'} saved on this device.`;
+  return `${outboxSummary.pending} flood report${outboxSummary.pending === 1 ? '' : 's'} saved locally. Sync them when online.`;
 }
