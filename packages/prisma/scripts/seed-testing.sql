@@ -118,7 +118,6 @@ SELECT
   )[(floor(random() * 5)::int + 1)],
   (
     ARRAY[
-      'None'::"water_level",
       'Ankle'::"water_level",
       'Knee'::"water_level",
       'Waist'::"water_level",
@@ -126,7 +125,7 @@ SELECT
       'Roof'::"water_level",
       'Unknown'::"water_level"
     ]
-  )[(floor(random() * 7)::int + 1)],
+  )[(floor(random() * 6)::int + 1)],
   CURRENT_TIMESTAMP - (floor(random() * 72)::int || ' hours')::interval,
   'Seed responder'
 FROM generate_series(1, 200) AS "source"("house_number");

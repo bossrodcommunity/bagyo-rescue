@@ -48,6 +48,16 @@ type ReportActionPageProps = {
   type: ReportHistoryType;
 };
 
+type FloodReportWaterLevel = NonNullable<ReportHistoryWaterLevel>;
+
+const DEFAULT_FLOOD_REPORT_WATER_LEVEL = 'Unknown' satisfies FloodReportWaterLevel;
+
+function getFloodReportWaterLevel(value: string | null | undefined) {
+  const isWaterLevel = Constants.public.Enums.water_level.some(level => level === value);
+
+  return isWaterLevel ? (value as FloodReportWaterLevel) : DEFAULT_FLOOD_REPORT_WATER_LEVEL;
+}
+
 export function ReportActionPage({ type }: ReportActionPageProps) {
   const isFloodReport = type === 'Flood Report';
   const { access } = useResidentAccessSession();
@@ -214,7 +224,7 @@ function ReportForm({
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Label htmlFor="phoneNumber" className="sm:col-span-2">
-              Phone number
+              Phone number (optional)
               <Input
                 id="phoneNumber"
                 name="phoneNumber"
@@ -245,9 +255,7 @@ function ReportForm({
                 <Select
                   id="waterLevel"
                   name="waterLevel"
-                  defaultValue={
-                    access?.session.house.water_level ?? Constants.public.Enums.water_level[0]
-                  }
+                  defaultValue={getFloodReportWaterLevel(access?.session.house.water_level)}
                 >
                   {Constants.public.Enums.water_level.map(level => (
                     <option key={level} value={level}>
@@ -680,7 +688,7 @@ function ReportHistoryEditForm({
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Label htmlFor={`edit-phone-${reportHistory.id}`} className="sm:col-span-2">
-          Phone number
+          Phone number (optional)
           <Input
             id={`edit-phone-${reportHistory.id}`}
             name="phoneNumber"
@@ -711,7 +719,7 @@ function ReportHistoryEditForm({
             <Select
               id={`edit-water-${reportHistory.id}`}
               name="waterLevel"
-              defaultValue={reportHistory.water_level ?? Constants.public.Enums.water_level[0]}
+              defaultValue={getFloodReportWaterLevel(reportHistory.water_level)}
             >
               {Constants.public.Enums.water_level.map(level => (
                 <option key={level} value={level}>

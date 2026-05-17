@@ -11,5 +11,9 @@ export function registerServiceWorker() {
     window.dispatchEvent(new CustomEvent('bagyo-rescue:update-ready'));
   });
 
+  worker.addEventListener('controlling', () => {
+    window.location.reload();
+  });
+
   worker.register();
 }

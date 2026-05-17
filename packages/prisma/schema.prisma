@@ -22,7 +22,6 @@ enum HouseStatus {
 }
 
 enum WaterLevel {
-  NONE    @map("None")
   ANKLE   @map("Ankle")
   KNEE    @map("Knee")
   WAIST   @map("Waist")
