@@ -1,18 +1,17 @@
 export { dexie, createDexieClient, type BagyoRescueDexie } from './client';
-export { addReport, listReports, seedReports, updateReportStatus } from './reports';
 export {
-  addRescuePing,
-  getRescuePing,
-  listRescuePings,
-  listRescuePingsForSync,
-  updateRescuePingSyncState,
-  type AddRescuePingInput,
-} from './rescue-pings';
+  addReportHistory,
+  getReportHistory,
+  listReportHistories,
+  listReportHistoriesForSync,
+  updateReportHistorySyncState,
+  type AddReportHistoryInput,
+} from './report-histories';
 export { dexieSchema } from './schema';
 export type {
-  RescuePing,
-  RescuePingSyncStatus,
-  RescuePriority,
-  RescueReport,
-  RescueStatus,
+  ReportHistory,
+  ReportHistorySyncStatus,
+  ReportHistoryType,
+  ReportHistoryWaterLevel,
+  ResidentAccessMethod,
 } from './types';

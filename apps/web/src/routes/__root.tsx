@@ -1,9 +1,11 @@
 import { Link, Outlet, createRootRouteWithContext, useRouterState } from '@tanstack/react-router';
 import type { QueryClient } from '@tanstack/react-query';
+import { IconLogout } from '@tabler/icons-react';
 import { Wordmark } from '@/components/brand/wordmark';
 import { OfflineBadge } from '@/components/ui/offline-badge';
 import { Button } from '@/components/ui/button';
 import { Page } from '@/components/ui/page';
+import { useAuth } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 
 type RouterContext = {
@@ -25,17 +27,20 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 
 const navItems = [
   { to: '/' as const, label: 'Dashboard' },
-  { to: '/resident' as const, label: 'Resident' },
-  { to: '/ping' as const, label: 'Ping Rescue' },
-  { to: '/reports' as const, label: 'Reports' },
+  { to: '/report-flood' as const, label: 'Report Flood' },
+  { to: '/request-rescue' as const, label: 'Rescue Request' },
+  { to: '/hotlines' as const, label: 'Hotlines' },
   { to: '/admin' as const, label: 'Admin' },
 ];
 
 function RootLayout() {
   const pathname = useRouterState({ select: state => state.location.pathname });
+  const { user, isAuthenticated, logout } = useAuth();
   const isResidentRoute = pathname.startsWith('/resident');
   const visibleNav = isResidentRoute
-    ? navItems.filter(item => item.to === '/' || item.to === '/resident' || item.to === '/ping')
+    ? navItems.filter(
+        item => item.to === '/' || item.to === '/request-rescue' || item.to === '/hotlines'
+      )
     : navItems;
 
   return (
@@ -52,6 +57,21 @@ function RootLayout() {
             <span className="ml-3 hidden sm:inline-flex">
               <OfflineBadge />
             </span>
+            {isAuthenticated ? (
+              <span className="ml-2 hidden items-center gap-2 border-l border-border pl-3 md:inline-flex">
+                <span className="max-w-32 truncate text-label-md text-muted-foreground">
+                  {user?.username}
+                </span>
+                <Button size="sm" variant="ghost" type="button" onClick={() => void logout()}>
+                  <IconLogout className="size-4" aria-hidden="true" />
+                  Sign out
+                </Button>
+              </span>
+            ) : (
+              <Button asChild size="sm" variant="secondary" className="ml-2 hidden md:inline-flex">
+                <Link to="/sign-in">Sign in</Link>
+              </Button>
+            )}
           </nav>
         </div>
       </header>
@@ -64,7 +84,7 @@ function NavLink({
   to,
   label,
 }: {
-  to: '/' | '/resident' | '/ping' | '/reports' | '/admin';
+  to: '/' | '/report-flood' | '/request-rescue' | '/hotlines' | '/admin';
   label: string;
 }) {
   const baseClasses =

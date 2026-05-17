@@ -1,27 +1,30 @@
-export type RescuePriority = 'critical' | 'high' | 'medium' | 'low';
-export type RescueStatus = 'new' | 'triaged' | 'responding' | 'resolved';
+export type ReportHistorySyncStatus = 'queued' | 'sending' | 'sent' | 'failed';
+export type ReportHistoryType = 'Flood Report' | 'Rescue Request';
+export type ReportHistoryWaterLevel =
+  | 'None'
+  | 'Ankle'
+  | 'Knee'
+  | 'Waist'
+  | 'Chest'
+  | 'Roof'
+  | 'Unknown';
+export type ResidentAccessMethod = 'scan' | 'upload' | 'manual';
 
-export type RescueReport = {
+export type ReportHistory = {
   id: string;
-  household: string;
-  location: string;
-  priority: RescuePriority;
-  status: RescueStatus;
-  people: number;
-  notes: string;
-  createdAt: number;
-};
-
-export type RescuePingSyncStatus = 'queued' | 'sending' | 'sent' | 'failed';
-
-export type RescuePing = {
-  id: string;
-  phoneNumber: string;
-  latitude: number;
-  longitude: number;
+  type: ReportHistoryType;
+  familyId: string;
+  houseId: string;
+  familyCode: string;
+  accessMethod: ResidentAccessMethod;
+  phoneNumber: string | null;
+  latitude: number | null;
+  longitude: number | null;
   accuracyMeters: number | null;
+  waterLevel: ReportHistoryWaterLevel | null;
+  peopleCount: number | null;
   note: string;
-  syncStatus: RescuePingSyncStatus;
+  syncStatus: ReportHistorySyncStatus;
   retryCount: number;
   lastSyncError: string | null;
   syncedAt: number | null;

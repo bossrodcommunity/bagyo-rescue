@@ -5,7 +5,7 @@ export * from './evacuation-centers';
 export * from './families';
 export * from './houses';
 export * from './lgus';
-export * from './rescue-pings';
+export * from './report-histories';
 export * from './residents';
 export * from './transform-to-paginated-response';
 export * from './types';

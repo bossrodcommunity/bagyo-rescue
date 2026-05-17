@@ -1,8 +1,7 @@
 export const dexieSchema = {
   databaseName: 'bagyoRescue',
-  version: 2,
+  version: 5,
   stores: {
-    reports: 'id, createdAt, priority, status, location',
-    rescuePings: 'id, createdAt, syncStatus, phoneNumber',
+    reportHistories: 'id, type, createdAt, syncStatus, familyId',
   },
 } as const;

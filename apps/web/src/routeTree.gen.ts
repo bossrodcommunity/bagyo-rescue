@@ -9,10 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as ResidentRouteImport } from './routes/resident'
-import { Route as ReportsRouteImport } from './routes/reports'
+import { Route as RequestRescueRouteImport } from './routes/request-rescue'
+import { Route as ReportFloodRouteImport } from './routes/report-flood'
 import { Route as RecordsRouteImport } from './routes/records'
 import { Route as PingRouteImport } from './routes/ping'
+import { Route as HotlinesRouteImport } from './routes/hotlines'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RecordsIndexRouteImport } from './routes/records/index'
@@ -25,14 +28,24 @@ import { Route as RecordsEvacuationCenterAssignmentsRouteImport } from './routes
 import { Route as RecordsContactPersonsRouteImport } from './routes/records/contact-persons'
 import { Route as RecordsBarangaysRouteImport } from './routes/records/barangays'
 
+const SignInRoute = SignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResidentRoute = ResidentRouteImport.update({
   id: '/resident',
   path: '/resident',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ReportsRoute = ReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
+const RequestRescueRoute = RequestRescueRouteImport.update({
+  id: '/request-rescue',
+  path: '/request-rescue',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportFloodRoute = ReportFloodRouteImport.update({
+  id: '/report-flood',
+  path: '/report-flood',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RecordsRoute = RecordsRouteImport.update({
@@ -43,6 +56,11 @@ const RecordsRoute = RecordsRouteImport.update({
 const PingRoute = PingRouteImport.update({
   id: '/ping',
   path: '/ping',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HotlinesRoute = HotlinesRouteImport.update({
+  id: '/hotlines',
+  path: '/hotlines',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -106,10 +124,13 @@ const RecordsBarangaysRoute = RecordsBarangaysRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/hotlines': typeof HotlinesRoute
   '/ping': typeof PingRoute
   '/records': typeof RecordsRouteWithChildren
-  '/reports': typeof ReportsRoute
+  '/report-flood': typeof ReportFloodRoute
+  '/request-rescue': typeof RequestRescueRoute
   '/resident': typeof ResidentRoute
+  '/sign-in': typeof SignInRoute
   '/records/barangays': typeof RecordsBarangaysRoute
   '/records/contact-persons': typeof RecordsContactPersonsRoute
   '/records/evacuation-center-assignments': typeof RecordsEvacuationCenterAssignmentsRoute
@@ -123,9 +144,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/hotlines': typeof HotlinesRoute
   '/ping': typeof PingRoute
-  '/reports': typeof ReportsRoute
+  '/report-flood': typeof ReportFloodRoute
+  '/request-rescue': typeof RequestRescueRoute
   '/resident': typeof ResidentRoute
+  '/sign-in': typeof SignInRoute
   '/records/barangays': typeof RecordsBarangaysRoute
   '/records/contact-persons': typeof RecordsContactPersonsRoute
   '/records/evacuation-center-assignments': typeof RecordsEvacuationCenterAssignmentsRoute
@@ -140,10 +164,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/hotlines': typeof HotlinesRoute
   '/ping': typeof PingRoute
   '/records': typeof RecordsRouteWithChildren
-  '/reports': typeof ReportsRoute
+  '/report-flood': typeof ReportFloodRoute
+  '/request-rescue': typeof RequestRescueRoute
   '/resident': typeof ResidentRoute
+  '/sign-in': typeof SignInRoute
   '/records/barangays': typeof RecordsBarangaysRoute
   '/records/contact-persons': typeof RecordsContactPersonsRoute
   '/records/evacuation-center-assignments': typeof RecordsEvacuationCenterAssignmentsRoute
@@ -159,10 +186,13 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/hotlines'
     | '/ping'
     | '/records'
-    | '/reports'
+    | '/report-flood'
+    | '/request-rescue'
     | '/resident'
+    | '/sign-in'
     | '/records/barangays'
     | '/records/contact-persons'
     | '/records/evacuation-center-assignments'
@@ -176,9 +206,12 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/hotlines'
     | '/ping'
-    | '/reports'
+    | '/report-flood'
+    | '/request-rescue'
     | '/resident'
+    | '/sign-in'
     | '/records/barangays'
     | '/records/contact-persons'
     | '/records/evacuation-center-assignments'
@@ -192,10 +225,13 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/hotlines'
     | '/ping'
     | '/records'
-    | '/reports'
+    | '/report-flood'
+    | '/request-rescue'
     | '/resident'
+    | '/sign-in'
     | '/records/barangays'
     | '/records/contact-persons'
     | '/records/evacuation-center-assignments'
@@ -210,14 +246,24 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  HotlinesRoute: typeof HotlinesRoute
   PingRoute: typeof PingRoute
   RecordsRoute: typeof RecordsRouteWithChildren
-  ReportsRoute: typeof ReportsRoute
+  ReportFloodRoute: typeof ReportFloodRoute
+  RequestRescueRoute: typeof RequestRescueRoute
   ResidentRoute: typeof ResidentRoute
+  SignInRoute: typeof SignInRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof SignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/resident': {
       id: '/resident'
       path: '/resident'
@@ -225,11 +271,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResidentRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/reports': {
-      id: '/reports'
-      path: '/reports'
-      fullPath: '/reports'
-      preLoaderRoute: typeof ReportsRouteImport
+    '/request-rescue': {
+      id: '/request-rescue'
+      path: '/request-rescue'
+      fullPath: '/request-rescue'
+      preLoaderRoute: typeof RequestRescueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/report-flood': {
+      id: '/report-flood'
+      path: '/report-flood'
+      fullPath: '/report-flood'
+      preLoaderRoute: typeof ReportFloodRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/records': {
@@ -244,6 +297,13 @@ declare module '@tanstack/react-router' {
       path: '/ping'
       fullPath: '/ping'
       preLoaderRoute: typeof PingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hotlines': {
+      id: '/hotlines'
+      path: '/hotlines'
+      fullPath: '/hotlines'
+      preLoaderRoute: typeof HotlinesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -357,10 +417,13 @@ const RecordsRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  HotlinesRoute: HotlinesRoute,
   PingRoute: PingRoute,
   RecordsRoute: RecordsRouteWithChildren,
-  ReportsRoute: ReportsRoute,
+  ReportFloodRoute: ReportFloodRoute,
+  RequestRescueRoute: RequestRescueRoute,
   ResidentRoute: ResidentRoute,
+  SignInRoute: SignInRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
