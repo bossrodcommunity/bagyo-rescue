@@ -47,7 +47,11 @@ function RootLayout() {
         </nav>
       </header>
       {!online || hasOutboxWork ? (
-        <section className="offline-banner" aria-label="Flood report sync status">
+        <section
+          className="offline-banner"
+          aria-label="Flood report sync status"
+          aria-live="polite"
+        >
           <p>{getSyncBannerCopy(online, outboxSummary)}</p>
           <button
             type="button"
@@ -98,7 +102,7 @@ function getSyncBannerCopy(
   }
 
   if (outboxSummary.failed > 0) {
-    return `${outboxSummary.failed} flood report sync failed, will retry.`;
+    return `${outboxSummary.failed} flood report${outboxSummary.failed === 1 ? '' : 's'} waiting to sync. Retry will keep using the local copy.`;
   }
 
   if (outboxSummary.syncing > 0) {

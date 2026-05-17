@@ -220,7 +220,7 @@ button {
 }
 
 .button:hover,
-button:hover {
+button:not(.option-card):hover {
   background: #0c75c6;
 }
 
@@ -543,10 +543,22 @@ th {
   white-space: normal;
 }
 
-.option-card.active {
+.option-card:hover {
   background: #eff7ff;
+  border-color: #7cc0fb;
+  color: #0f172b;
+}
+
+.option-card.active {
+  background: #128ee8;
   border-color: #128ee8;
-  color: #0f5ea0;
+  color: #ffffff;
+}
+
+.option-card.active:hover {
+  background: #0c75c6;
+  border-color: #0c75c6;
+  color: #ffffff;
 }
 
 .option-card span {
@@ -557,6 +569,15 @@ th {
   color: #64748b;
   display: block;
   margin-top: 4px;
+}
+
+.option-card:hover small {
+  color: #334155;
+}
+
+.option-card.active small,
+.option-card.active:hover small {
+  color: #eff7ff;
 }
 
 .success-message {
