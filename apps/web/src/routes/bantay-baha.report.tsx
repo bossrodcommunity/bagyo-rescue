@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useAddFloodReport } from '../data/use-flood-reports';
-import type { FloodRiskLevel } from '../db/schema';
+import type { FloodRiskLevel } from '@/lib/dexie';
 import { type CurrentLocationState, useCurrentLocation } from '../hooks/use-current-location';
 
 const riskLevels: { value: FloodRiskLevel; label: string; detail: string }[] = [

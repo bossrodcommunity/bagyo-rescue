@@ -1,6 +1,10 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useMemo } from 'react';
+import { IconArrowRight } from '@tabler/icons-react';
 import { useRescueReports } from '../data/use-rescue-reports';
+import { Page, PageHeader, PageTitle, PageDescription } from '@/components/ui/page';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export const Route = createFileRoute('/')({
   component: DashboardPage,
@@ -32,23 +36,25 @@ function DashboardPage() {
     );
   }, [reports]);
 
+  const newCount = summary.new;
+  const inProgress = summary.triaged + summary.responding;
+  const resolvedCount = summary.resolved;
+  const urgent = summary.critical + summary.high;
+
   return (
-    <main className="page">
-      <section className="hero">
-        <div>
-          <p className="eyebrow">Offline-ready coordination</p>
-          <h1>Track rescue reports even when connectivity drops.</h1>
-          <p>
-            Reports are persisted locally in IndexedDB through Dexie and surfaced through TanStack
-            Query, so field teams can keep working between sync windows.
-          </p>
-        </div>
-        <Link to="/reports" className="button">
-          Open reports
-        </Link>
+    <Page className="flex flex-col gap-10">
+      <PageHeader>
+        <PageTitle>Coordinator</PageTitle>
+        <PageDescription>A live count of rescue requests waiting on your team.</PageDescription>
+      </PageHeader>
+
+      <section aria-label="Rescue report summary" className="grid grid-cols-1 gap-8 sm:grid-cols-3">
+        <Metric tone="danger" value={newCount} label="Bagong Report" sublabel="Untriaged" />
+        <Metric tone="signal" value={inProgress} label="Ginagawa" sublabel="In progress" />
+        <Metric tone="safe" value={resolvedCount} label="Tapos" sublabel="Resolved" />
       </section>
 
-      <section className="module-hero module-hero--flood">
+      <section className="module-hero module-hero--flood" aria-label="Flood reporting">
         <div>
           <p className="eyebrow">Current flood conditions</p>
           <h2>Report flooding from your current location.</h2>
@@ -67,24 +73,53 @@ function DashboardPage() {
         </div>
       </section>
 
-      <section className="metrics" aria-label="Rescue report summary">
-        <article>
-          <span>{reports.length}</span>
-          <p>Total reports</p>
-        </article>
-        <article>
-          <span>{summary.critical + summary.high}</span>
-          <p>Urgent cases</p>
-        </article>
-        <article>
-          <span>{summary.people}</span>
-          <p>People affected</p>
-        </article>
-        <article>
-          <span>{summary.responding}</span>
-          <p>Active responses</p>
-        </article>
-      </section>
-    </main>
+      <p className="text-label-md text-muted-foreground">
+        {reports.length} total &middot; {urgent} urgent &middot; {summary.people} people affected
+      </p>
+
+      <div className="flex flex-wrap gap-3 border-t border-border pt-6">
+        <Button asChild variant="ghost" size="md">
+          <Link to="/reports" className="gap-1.5">
+            Open rescue queue
+            <IconArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        </Button>
+        <Button asChild variant="ghost" size="md">
+          <Link to="/admin" className="gap-1.5">
+            Manage records
+            <IconArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        </Button>
+      </div>
+    </Page>
+  );
+}
+
+type MetricProps = {
+  tone: 'danger' | 'signal' | 'safe';
+  value: number;
+  label: string;
+  sublabel: string;
+};
+
+const toneDot: Record<MetricProps['tone'], string> = {
+  danger: 'bg-danger',
+  signal: 'bg-signal',
+  safe: 'bg-safe',
+};
+
+function Metric({ tone, value, label, sublabel }: MetricProps) {
+  return (
+    <article className="flex flex-col gap-2">
+      <span className="font-display text-display-2xl tracking-tight text-foreground">{value}</span>
+      <span className="flex items-center gap-2 text-body-md font-medium text-foreground">
+        <span
+          aria-hidden="true"
+          className={cn('inline-block size-2 rounded-full', toneDot[tone])}
+        />
+        {label}
+      </span>
+      <span className="text-label-md text-muted-foreground">{sublabel}</span>
+    </article>
   );
 }

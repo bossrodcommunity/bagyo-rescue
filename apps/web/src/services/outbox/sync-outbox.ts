@@ -1,4 +1,4 @@
-import { db, type FloodReport, type OutboxItem } from '@/db/schema';
+import { dexie, type FloodOutboxItem, type FloodReport } from '@/lib/dexie';
 
 let activeSyncPromise: Promise<SyncOutboxResult> | null = null;
 
@@ -25,7 +25,7 @@ async function syncOutboxItems(): Promise<SyncOutboxResult> {
     return { failed: 0, skipped: 0, synced: 0 };
   }
 
-  const items = await db.outbox
+  const items = await dexie.outbox
     .where('type')
     .equals('flood-report.create')
     .and(item => item.status !== 'synced')
@@ -38,7 +38,7 @@ async function syncOutboxItems(): Promise<SyncOutboxResult> {
   };
 
   for (const item of items) {
-    const report = await db.floodReports.get(item.entityId);
+    const report = await dexie.floodReports.get(item.entityId);
 
     if (!report) {
       await markFailed(item, 'Local flood report was not found.');
@@ -63,8 +63,8 @@ async function syncOutboxItems(): Promise<SyncOutboxResult> {
   return result;
 }
 
-async function markSyncing(item: OutboxItem) {
-  await db.outbox.update(item.id, {
+async function markSyncing(item: FloodOutboxItem) {
+  await dexie.outbox.update(item.id, {
     attempts: item.attempts + 1,
     lastError: null,
     status: 'syncing',
@@ -72,12 +72,12 @@ async function markSyncing(item: OutboxItem) {
   });
 }
 
-async function markSynced(item: OutboxItem, reportId: string) {
+async function markSynced(item: FloodOutboxItem, reportId: string) {
   const now = Date.now();
 
-  await db.transaction('rw', db.floodReports, db.outbox, async () => {
-    await db.floodReports.update(reportId, { syncedAt: now });
-    await db.outbox.update(item.id, {
+  await dexie.transaction('rw', dexie.floodReports, dexie.outbox, async () => {
+    await dexie.floodReports.update(reportId, { syncedAt: now });
+    await dexie.outbox.update(item.id, {
       lastError: null,
       status: 'synced',
       syncedAt: now,
@@ -86,8 +86,8 @@ async function markSynced(item: OutboxItem, reportId: string) {
   });
 }
 
-async function markFailed(item: OutboxItem, lastError: string) {
-  await db.outbox.update(item.id, {
+async function markFailed(item: FloodOutboxItem, lastError: string) {
+  await dexie.outbox.update(item.id, {
     lastError,
     status: 'failed',
     updatedAt: Date.now(),

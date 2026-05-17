@@ -35,7 +35,7 @@ export async function searchResidentsData({
 
   if (filters?.searchText) {
     query = query.or(
-      `first_name.ilike.%${filters.searchText}%,last_name.ilike.%${filters.searchText}%`
+      `first_name.ilike.%${filters.searchText}%,last_name.ilike.%${filters.searchText}%,phone_number.ilike.%${filters.searchText}%`
     );
   }
 

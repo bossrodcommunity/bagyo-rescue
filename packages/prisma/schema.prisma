@@ -110,174 +110,186 @@ enum EvacuationAssignmentStatus {
   @@map("evacuation_assignment_status")
 }
 
+enum RescuePingStatus {
+  NEW          @map("New")
+  ACKNOWLEDGED @map("Acknowledged")
+  RESPONDING   @map("Responding")
+  RESOLVED     @map("Resolved")
+
+  @@map("rescue_ping_status")
+}
+
 model Lgu {
-  id                 String             @id @default(dbgenerated("concat('lgu_', replace((gen_random_uuid())::text, '-'::text, ''::text))"))
-  name               String
-  province           String
-  cityOrMunicipality String             @map("city_or_municipality")
-  createdAt          DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt          DateTime           @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
-  barangays          Barangay[]
-  evacuationCenters  EvacuationCenter[]
+  id                   String             @id @default(dbgenerated("concat('lgu_', replace((gen_random_uuid())::text, '-'::text, ''::text))"))
+  name                 String
+  province             String
+  city_or_municipality String
+  created_at           DateTime           @default(now()) @db.Timestamptz(6)
+  updated_at           DateTime           @default(now()) @updatedAt @db.Timestamptz(6)
+  barangays            Barangay[]
+  evacuation_centers   EvacuationCenter[]
 
   @@map("lgus")
 }
 
 model Barangay {
-  id                String             @id @default(dbgenerated("concat('brgy_', replace((gen_random_uuid())::text, '-'::text, ''::text))"))
-  lguId             String             @map("lgu_id")
-  name              String
-  areaName          String?            @map("area_name")
-  riskLevel         RiskLevel          @map("risk_level")
-  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt         DateTime           @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
-  lgu               Lgu                @relation(fields: [lguId], references: [id], onDelete: Cascade)
-  houses            House[]
-  evacuationCenters EvacuationCenter[]
+  id                 String             @id @default(dbgenerated("concat('brgy_', replace((gen_random_uuid())::text, '-'::text, ''::text))"))
+  lgu_id             String
+  name               String
+  area_name          String?
+  risk_level         RiskLevel
+  created_at         DateTime           @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime           @default(now()) @updatedAt @db.Timestamptz(6)
+  lgu                Lgu                @relation(fields: [lgu_id], references: [id], onDelete: Cascade)
+  houses             House[]
+  evacuation_centers EvacuationCenter[]
 
-  @@index([lguId])
+  @@index([lgu_id])
   @@map("barangays")
 }
 
 model House {
-  id            String                       @id @default(dbgenerated("concat('house_', replace((gen_random_uuid())::text, '-'::text, ''::text))"))
-  barangayId    String                       @map("barangay_id")
-  houseCode     String                       @unique @map("house_code")
-  address       String
-  landmark      String?
-  latitude      Decimal?                     @db.Decimal(9, 6)
-  longitude     Decimal?                     @db.Decimal(9, 6)
-  currentStatus HouseStatus                  @default(NOT_CHECKED) @map("current_status")
-  waterLevel    WaterLevel                   @default(UNKNOWN) @map("water_level")
-  lastCheckedAt DateTime?                    @map("last_checked_at") @db.Timestamptz(6)
-  lastCheckedBy String?                      @map("last_checked_by")
-  createdAt     DateTime                     @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt     DateTime                     @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
-  barangay      Barangay                     @relation(fields: [barangayId], references: [id], onDelete: Cascade)
-  families      Family[]
-  assignments   EvacuationCenterAssignment[]
+  id              String                       @id @default(dbgenerated("concat('house_', replace((gen_random_uuid())::text, '-'::text, ''::text))"))
+  barangay_id     String
+  address         String
+  landmark        String?
+  latitude        Decimal?                     @db.Decimal(9, 6)
+  longitude       Decimal?                     @db.Decimal(9, 6)
+  current_status  HouseStatus                  @default(NOT_CHECKED)
+  water_level     WaterLevel                   @default(UNKNOWN)
+  last_checked_at DateTime?                    @db.Timestamptz(6)
+  last_checked_by String?
+  created_at      DateTime                     @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime                     @default(now()) @updatedAt @db.Timestamptz(6)
+  barangay        Barangay                     @relation(fields: [barangay_id], references: [id], onDelete: Cascade)
+  families        Family[]
+  assignments     EvacuationCenterAssignment[]
 
-  @@index([barangayId])
-  @@index([currentStatus])
-  @@index([waterLevel])
+  @@index([barangay_id])
+  @@index([current_status])
+  @@index([water_level])
   @@map("houses")
 }
 
 model Family {
-  id                          String                       @id @default(dbgenerated("concat('family_', replace((gen_random_uuid())::text, '-'::text, ''::text))"))
-  houseId                     String                       @map("house_id")
-  familyName                  String                       @map("family_name")
-  headOfFamily                String                       @map("head_of_family")
-  totalMembers                Int                          @default(0) @map("total_members")
-  currentInsideCount          Int                          @default(0) @map("current_inside_count")
-  evacuatedCount              Int                          @default(0) @map("evacuated_count")
-  missingOrUnconfirmedCount   Int                          @default(0) @map("missing_or_unconfirmed_count")
-  needsAssistance             Boolean                      @default(false) @map("needs_assistance")
-  notes                       String?
-  createdAt                   DateTime                     @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt                   DateTime                     @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
-  house                       House                        @relation(fields: [houseId], references: [id], onDelete: Cascade)
-  residents                   Resident[]
-  evacuationCenterAssignments EvacuationCenterAssignment[]
+  id                            String                       @id @default(dbgenerated("concat('family_', replace((gen_random_uuid())::text, '-'::text, ''::text))"))
+  house_id                      String
+  family_code                   String                       @unique @default(dbgenerated("concat('FAM-', upper(substr(replace((gen_random_uuid())::text, '-'::text, ''::text), 1, 6)))"))
+  pin_code                      String                       @default("0000") @db.VarChar(4)
+  family_name                   String
+  head_of_family                String
+  head_of_family_phone_number   String?
+  total_members                 Int                          @default(0)
+  current_inside_count          Int                          @default(0)
+  evacuated_count               Int                          @default(0)
+  missing_or_unconfirmed_count  Int                          @default(0)
+  needs_assistance              Boolean                      @default(false)
+  notes                         String?
+  created_at                    DateTime                     @default(now()) @db.Timestamptz(6)
+  updated_at                    DateTime                     @default(now()) @updatedAt @db.Timestamptz(6)
+  house                         House                        @relation(fields: [house_id], references: [id], onDelete: Cascade)
+  residents                     Resident[]
+  evacuation_center_assignments EvacuationCenterAssignment[]
 
-  @@index([houseId])
-  @@index([needsAssistance])
+  @@index([house_id])
+  @@index([needs_assistance])
   @@map("families")
 }
 
 model Resident {
-  id            String         @id @default(dbgenerated("concat('resident_', replace((gen_random_uuid())::text, '-'::text, ''::text))"))
-  familyId      String         @map("family_id")
-  firstName     String         @map("first_name")
-  lastName      String         @map("last_name")
-  age           Int?
-  sex           Sex
-  isSenior      Boolean        @default(false) @map("is_senior")
-  isChild       Boolean        @default(false) @map("is_child")
-  isPwd         Boolean        @default(false) @map("is_pwd")
-  isPregnant    Boolean        @default(false) @map("is_pregnant")
-  currentStatus ResidentStatus @default(INSIDE_HOUSE) @map("current_status")
-  createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt     DateTime       @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
-  family        Family         @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  id             String         @id @default(dbgenerated("concat('resident_', replace((gen_random_uuid())::text, '-'::text, ''::text))"))
+  family_id      String
+  first_name     String
+  last_name      String
+  phone_number   String?
+  age            Int?
+  sex            Sex
+  is_senior      Boolean        @default(false)
+  is_child       Boolean        @default(false)
+  is_pwd         Boolean        @default(false)
+  is_pregnant    Boolean        @default(false)
+  current_status ResidentStatus @default(INSIDE_HOUSE)
+  created_at     DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime       @default(now()) @updatedAt @db.Timestamptz(6)
+  family         Family         @relation(fields: [family_id], references: [id], onDelete: Cascade)
 
-  @@index([familyId])
-  @@index([currentStatus])
-  @@index([isSenior])
-  @@index([isChild])
-  @@index([isPwd])
-  @@index([isPregnant])
+  @@index([family_id])
+  @@index([current_status])
+  @@index([is_senior])
+  @@index([is_child])
+  @@index([is_pwd])
+  @@index([is_pregnant])
   @@map("residents")
 }
 
 model ContactPerson {
-  id                     String            @id @default(dbgenerated("concat('cp_', replace((gen_random_uuid())::text, '-'::text, ''::text))"))
-  entityType             ContactEntityType @map("entity_type")
-  entityId               String            @map("entity_id")
-  fullName               String            @map("full_name")
-  role                   ContactRole
-  contactNumber          String            @map("contact_number")
-  alternateContactNumber String?           @map("alternate_contact_number")
-  email                  String?
-  isPrimary              Boolean           @default(false) @map("is_primary")
-  notes                  String?
-  createdAt              DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt              DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id                       String            @id @default(dbgenerated("concat('cp_', replace((gen_random_uuid())::text, '-'::text, ''::text))"))
+  entity_type              ContactEntityType
+  entity_id                String
+  full_name                String
+  role                     ContactRole
+  contact_number           String
+  alternate_contact_number String?
+  email                    String?
+  is_primary               Boolean           @default(false)
+  notes                    String?
+  created_at               DateTime          @default(now()) @db.Timestamptz(6)
+  updated_at               DateTime          @default(now()) @updatedAt @db.Timestamptz(6)
 
-  @@index([entityType, entityId])
-  @@index([isPrimary])
+  @@index([entity_type, entity_id])
+  @@index([is_primary])
   @@map("contact_persons")
 }
 
 model EvacuationCenter {
-  id                String                       @id @default(dbgenerated("concat('evac_', replace((gen_random_uuid())::text, '-'::text, ''::text))"))
-  lguId             String                       @map("lgu_id")
-  barangayId        String?                      @map("barangay_id")
-  name              String
-  type              EvacuationCenterType         @default(OTHER)
-  address           String
-  landmark          String?
-  latitude          Decimal?                     @db.Decimal(9, 6)
-  longitude         Decimal?                     @db.Decimal(9, 6)
-  capacity          Int                          @default(0)
-  currentOccupancy  Int                          @default(0) @map("current_occupancy")
-  status            EvacuationCenterStatus       @default(OPEN)
-  hasFoodSupply     Boolean                      @default(false) @map("has_food_supply")
-  hasWaterSupply    Boolean                      @default(false) @map("has_water_supply")
-  hasMedicalSupport Boolean                      @default(false) @map("has_medical_support")
-  hasPower          Boolean                      @default(false) @map("has_power")
-  notes             String?
-  createdAt         DateTime                     @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt         DateTime                     @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
-  lgu               Lgu                          @relation(fields: [lguId], references: [id], onDelete: Cascade)
-  barangay          Barangay?                    @relation(fields: [barangayId], references: [id], onDelete: SetNull)
-  assignments       EvacuationCenterAssignment[]
+  id                  String                       @id @default(dbgenerated("concat('evac_', replace((gen_random_uuid())::text, '-'::text, ''::text))"))
+  lgu_id              String
+  barangay_id         String?
+  name                String
+  type                EvacuationCenterType         @default(OTHER)
+  address             String
+  landmark            String?
+  latitude            Decimal?                     @db.Decimal(9, 6)
+  longitude           Decimal?                     @db.Decimal(9, 6)
+  capacity            Int                          @default(0)
+  current_occupancy   Int                          @default(0)
+  status              EvacuationCenterStatus       @default(OPEN)
+  has_food_supply     Boolean                      @default(false)
+  has_water_supply    Boolean                      @default(false)
+  has_medical_support Boolean                      @default(false)
+  has_power           Boolean                      @default(false)
+  notes               String?
+  created_at          DateTime                     @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime                     @default(now()) @updatedAt @db.Timestamptz(6)
+  lgu                 Lgu                          @relation(fields: [lgu_id], references: [id], onDelete: Cascade)
+  barangay            Barangay?                    @relation(fields: [barangay_id], references: [id], onDelete: SetNull)
+  assignments         EvacuationCenterAssignment[]
 
-  @@index([lguId])
-  @@index([barangayId])
+  @@index([lgu_id])
+  @@index([barangay_id])
   @@index([status])
   @@map("evacuation_centers")
 }
 
 model EvacuationCenterAssignment {
-  id                 String                     @id @default(dbgenerated("concat('evac_assignment_', replace((gen_random_uuid())::text, '-'::text, ''::text))"))
-  evacuationCenterId String                     @map("evacuation_center_id")
-  familyId           String                     @map("family_id")
-  houseId            String                     @map("house_id")
-  numberOfPeople     Int                        @default(0) @map("number_of_people")
-  status             EvacuationAssignmentStatus @default(ASSIGNED)
-  arrivedAt          DateTime?                  @map("arrived_at") @db.Timestamptz(6)
-  leftAt             DateTime?                  @map("left_at") @db.Timestamptz(6)
-  notes              String?
-  createdAt          DateTime                   @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt          DateTime                   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
-  evacuationCenter   EvacuationCenter           @relation(fields: [evacuationCenterId], references: [id], onDelete: Cascade)
-  family             Family                     @relation(fields: [familyId], references: [id], onDelete: Cascade)
-  house              House                      @relation(fields: [houseId], references: [id], onDelete: Cascade)
+  id                   String                     @id @default(dbgenerated("concat('evac_assignment_', replace((gen_random_uuid())::text, '-'::text, ''::text))"))
+  evacuation_center_id String
+  family_id            String
+  house_id             String
+  number_of_people     Int                        @default(0)
+  status               EvacuationAssignmentStatus @default(ASSIGNED)
+  arrived_at           DateTime?                  @db.Timestamptz(6)
+  left_at              DateTime?                  @db.Timestamptz(6)
+  notes                String?
+  created_at           DateTime                   @default(now()) @db.Timestamptz(6)
+  updated_at           DateTime                   @default(now()) @updatedAt @db.Timestamptz(6)
+  evacuation_center    EvacuationCenter           @relation(fields: [evacuation_center_id], references: [id], onDelete: Cascade)
+  family               Family                     @relation(fields: [family_id], references: [id], onDelete: Cascade)
+  house                House                      @relation(fields: [house_id], references: [id], onDelete: Cascade)
 
-  @@index([evacuationCenterId])
-  @@index([familyId])
-  @@index([houseId])
+  @@index([evacuation_center_id])
+  @@index([family_id])
+  @@index([house_id])
   @@index([status])
   @@map("evacuation_center_assignments")
 }
@@ -301,4 +313,22 @@ model FloodReport {
   @@index([status])
   @@index([expiresAt])
   @@map("flood_reports")
+}
+
+model RescuePing {
+  id                String           @id @default(dbgenerated("concat('ping_', replace((gen_random_uuid())::text, '-'::text, ''::text))"))
+  phone_number      String
+  latitude          Decimal          @db.Decimal(9, 6)
+  longitude         Decimal          @db.Decimal(9, 6)
+  accuracy_meters   Decimal?         @db.Decimal(10, 2)
+  note              String?
+  source            String           @default("web")
+  status            RescuePingStatus @default(NEW)
+  client_created_at DateTime         @db.Timestamptz(6)
+  created_at        DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime         @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@index([status])
+  @@index([created_at])
+  @@map("rescue_pings")
 }

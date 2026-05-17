@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { addReport, listReports, updateReportStatus } from '../db/reports';
-import type { RescueReport } from '../db/schema';
+import { addReport, listReports, updateReportStatus, type RescueReport } from '@/lib/dexie';
 
 export const reportsQueryKey = ['rescue-reports'];
 

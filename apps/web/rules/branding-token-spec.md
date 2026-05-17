@@ -16,9 +16,9 @@ Use it for frontend and brand exploration work in this repo. Stable brand decisi
 ## Typography Tokens
 
 ```css
---font-display: "Outfit", sans-serif;
---font-body: "DM Sans", sans-serif;
---font-ui: "DM Sans", sans-serif;
+--font-display: 'Outfit', sans-serif;
+--font-body: 'DM Sans', sans-serif;
+--font-ui: 'DM Sans', sans-serif;
 ```
 
 ### Type Roles
@@ -202,9 +202,9 @@ Do not:
 
 ```css
 :root {
-  --font-display: "Outfit", sans-serif;
-  --font-body: "DM Sans", sans-serif;
-  --font-ui: "DM Sans", sans-serif;
+  --font-display: 'Outfit', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-ui: 'DM Sans', sans-serif;
 
   --color-bg: #f8fafc;
   --color-surface: #ffffff;

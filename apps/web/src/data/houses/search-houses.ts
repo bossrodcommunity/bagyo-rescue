@@ -31,7 +31,7 @@ export async function searchHousesData({
 
   if (filters?.searchText) {
     query = query.or(
-      `house_code.ilike.%${filters.searchText}%,address.ilike.%${filters.searchText}%,landmark.ilike.%${filters.searchText}%`
+      `address.ilike.%${filters.searchText}%,landmark.ilike.%${filters.searchText}%`
     );
   }
 

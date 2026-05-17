@@ -1,4 +1,5 @@
-import { db, type RescueReport } from './schema';
+import { dexie } from './client';
+import type { RescueReport } from './types';
 
 const starterReports: RescueReport[] = [
   {
@@ -34,18 +35,18 @@ const starterReports: RescueReport[] = [
 ];
 
 export async function seedReports() {
-  const count = await db.reports.count();
+  const count = await dexie.reports.count();
 
   if (count > 0) {
     return;
   }
 
-  await db.reports.bulkAdd(starterReports);
+  await dexie.reports.bulkAdd(starterReports);
 }
 
 export async function listReports() {
   await seedReports();
-  return db.reports.orderBy('createdAt').reverse().toArray();
+  return dexie.reports.orderBy('createdAt').reverse().toArray();
 }
 
 export async function addReport(input: Omit<RescueReport, 'id' | 'createdAt' | 'status'>) {
@@ -56,10 +57,10 @@ export async function addReport(input: Omit<RescueReport, 'id' | 'createdAt' | '
     createdAt: Date.now(),
   };
 
-  await db.reports.add(report);
+  await dexie.reports.add(report);
   return report;
 }
 
 export async function updateReportStatus(id: string, status: RescueReport['status']) {
-  await db.reports.update(id, { status });
+  await dexie.reports.update(id, { status });
 }

@@ -6,6 +6,7 @@ import { BadRequestError } from '@/utils/errors';
 export type SearchFamiliesFilters = {
   searchText?: string;
   houseId?: string;
+  familyCode?: string;
   needsAssistance?: boolean;
 };
 
@@ -29,12 +30,16 @@ export async function searchFamiliesData({
 
   if (filters?.searchText) {
     query = query.or(
-      `family_name.ilike.%${filters.searchText}%,head_of_family.ilike.%${filters.searchText}%,notes.ilike.%${filters.searchText}%`
+      `family_code.ilike.%${filters.searchText}%,family_name.ilike.%${filters.searchText}%,head_of_family.ilike.%${filters.searchText}%,head_of_family_phone_number.ilike.%${filters.searchText}%,notes.ilike.%${filters.searchText}%`
     );
   }
 
   if (filters?.houseId) {
     query = query.eq('house_id', filters.houseId);
+  }
+
+  if (filters?.familyCode) {
+    query = query.eq('family_code', filters.familyCode);
   }
 
   if (filters?.needsAssistance !== undefined) {

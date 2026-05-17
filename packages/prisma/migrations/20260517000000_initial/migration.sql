@@ -2,11 +2,49 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 CREATE TYPE "risk_level" AS ENUM ('Low', 'Medium', 'High', 'Critical');
-CREATE TYPE "house_status" AS ENUM ('Not Checked', 'Safe', 'Needs Assistance', 'Needs Rescue', 'Evacuated');
-CREATE TYPE "water_level" AS ENUM ('None', 'Ankle', 'Knee', 'Waist', 'Chest', 'Roof', 'Unknown');
-CREATE TYPE "sex" AS ENUM ('Male', 'Female', 'Other', 'Prefer Not To Say');
-CREATE TYPE "resident_status" AS ENUM ('Inside House', 'Evacuated', 'Missing / Unconfirmed', 'Needs Rescue', 'Safe');
-CREATE TYPE "contact_entity_type" AS ENUM ('LGU', 'Barangay', 'Area', 'House', 'Family', 'Evacuation Center');
+
+CREATE TYPE "house_status" AS ENUM (
+  'Not Checked',
+  'Safe',
+  'Needs Assistance',
+  'Needs Rescue',
+  'Evacuated'
+);
+
+CREATE TYPE "water_level" AS ENUM (
+  'None',
+  'Ankle',
+  'Knee',
+  'Waist',
+  'Chest',
+  'Roof',
+  'Unknown'
+);
+
+CREATE TYPE "sex" AS ENUM (
+  'Male',
+  'Female',
+  'Other',
+  'Prefer Not To Say'
+);
+
+CREATE TYPE "resident_status" AS ENUM (
+  'Inside House',
+  'Evacuated',
+  'Missing / Unconfirmed',
+  'Needs Rescue',
+  'Safe'
+);
+
+CREATE TYPE "contact_entity_type" AS ENUM (
+  'LGU',
+  'Barangay',
+  'Area',
+  'House',
+  'Family',
+  'Evacuation Center'
+);
+
 CREATE TYPE "contact_role" AS ENUM (
   'LGU Admin',
   'MDRRMO Officer',
@@ -19,6 +57,7 @@ CREATE TYPE "contact_role" AS ENUM (
   'Relative',
   'Volunteer'
 );
+
 CREATE TYPE "evacuation_center_type" AS ENUM (
   'School',
   'Covered Court',
@@ -28,8 +67,22 @@ CREATE TYPE "evacuation_center_type" AS ENUM (
   'Community Center',
   'Other'
 );
-CREATE TYPE "evacuation_center_status" AS ENUM ('Open', 'Near Capacity', 'Full', 'Closed', 'Unavailable');
-CREATE TYPE "evacuation_assignment_status" AS ENUM ('Assigned', 'Checked In', 'Transferred', 'Left', 'Missing / Unconfirmed');
+
+CREATE TYPE "evacuation_center_status" AS ENUM (
+  'Open',
+  'Near Capacity',
+  'Full',
+  'Closed',
+  'Unavailable'
+);
+
+CREATE TYPE "evacuation_assignment_status" AS ENUM (
+  'Assigned',
+  'Checked In',
+  'Transferred',
+  'Left',
+  'Missing / Unconfirmed'
+);
 
 CREATE TABLE "lgus" (
   "id" TEXT NOT NULL DEFAULT concat('lgu_', replace((gen_random_uuid())::text, '-'::text, ''::text)),
@@ -57,7 +110,6 @@ CREATE TABLE "barangays" (
 CREATE TABLE "houses" (
   "id" TEXT NOT NULL DEFAULT concat('house_', replace((gen_random_uuid())::text, '-'::text, ''::text)),
   "barangay_id" TEXT NOT NULL,
-  "house_code" TEXT NOT NULL,
   "address" TEXT NOT NULL,
   "landmark" TEXT,
   "latitude" DECIMAL(9, 6),
@@ -75,8 +127,11 @@ CREATE TABLE "houses" (
 CREATE TABLE "families" (
   "id" TEXT NOT NULL DEFAULT concat('family_', replace((gen_random_uuid())::text, '-'::text, ''::text)),
   "house_id" TEXT NOT NULL,
+  "family_code" TEXT NOT NULL DEFAULT concat('FAM-', upper(substr(replace((gen_random_uuid())::text, '-'::text, ''::text), 1, 6))),
+  "pin_code" VARCHAR(4) NOT NULL DEFAULT '0000',
   "family_name" TEXT NOT NULL,
   "head_of_family" TEXT NOT NULL,
+  "head_of_family_phone_number" TEXT,
   "total_members" INTEGER NOT NULL DEFAULT 0,
   "current_inside_count" INTEGER NOT NULL DEFAULT 0,
   "evacuated_count" INTEGER NOT NULL DEFAULT 0,
@@ -98,6 +153,7 @@ CREATE TABLE "residents" (
   "family_id" TEXT NOT NULL,
   "first_name" TEXT NOT NULL,
   "last_name" TEXT NOT NULL,
+  "phone_number" TEXT,
   "age" INTEGER,
   "sex" "sex" NOT NULL,
   "is_senior" BOOLEAN NOT NULL DEFAULT false,
@@ -172,12 +228,11 @@ CREATE TABLE "evacuation_center_assignments" (
   CONSTRAINT "evacuation_center_assignments_number_of_people_nonnegative" CHECK ("number_of_people" >= 0)
 );
 
-CREATE UNIQUE INDEX "houses_house_code_key" ON "houses"("house_code");
-
 CREATE INDEX "barangays_lgu_id_idx" ON "barangays"("lgu_id");
 CREATE INDEX "houses_barangay_id_idx" ON "houses"("barangay_id");
 CREATE INDEX "houses_current_status_idx" ON "houses"("current_status");
 CREATE INDEX "houses_water_level_idx" ON "houses"("water_level");
+CREATE UNIQUE INDEX "families_family_code_key" ON "families"("family_code");
 CREATE INDEX "families_house_id_idx" ON "families"("house_id");
 CREATE INDEX "families_needs_assistance_idx" ON "families"("needs_assistance");
 CREATE INDEX "residents_family_id_idx" ON "residents"("family_id");

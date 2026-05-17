@@ -19,6 +19,11 @@ Assume `pnpm dev` is already running. Do not start or restart it.
 Database work targets Supabase only. Use Prisma in `packages/prisma` for schema
 and migrations, with `DATABASE_URL` pointing at the Supabase database.
 
+When creating migrations for triggers, database functions, RLS policies, cron
+jobs, or any database script, implement the database change through
+`packages/prisma/schema.prisma` and Prisma-managed migrations. Do not place
+database scripts outside the Prisma package.
+
 Use existing scripts when you need checks, builds, or database tasks:
 
 - `pnpm build` - build all workspaces

@@ -6,7 +6,8 @@
     "db:pull": "prisma db pull",
     "db:deploy": "prisma migrate deploy",
     "db:dev": "prisma migrate dev",
-    "db:status": "prisma migrate status"
+    "db:status": "prisma migrate status",
+    "db:seed:test": "prisma db execute --file ./scripts/seed-testing.sql"
   },
   "devDependencies": {
     "dotenv": "^17.4.2",

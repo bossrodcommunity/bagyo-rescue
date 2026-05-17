@@ -1,4 +1,5 @@
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
+import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
@@ -24,6 +25,7 @@ export default defineConfig({
       autoCodeSplitting: true,
     }),
     react(),
+    tailwindcss(),
     VitePWA({
       base,
       scope: base,
@@ -33,12 +35,18 @@ export default defineConfig({
       manifest: {
         name: 'Bagyo Rescue',
         short_name: 'Bagyo Rescue',
-        description: 'Offline-ready rescue reports and coordination dashboard.',
-        theme_color: '#0f766e',
-        background_color: '#f8fafc',
+        description:
+          'Tulong sa bagyo, kahit walang signal. Offline-ready typhoon rescue requests and coordination.',
+        lang: 'tl',
+        // Resolved from --color-rescue-600 (oklch(0.52 0.205 260)).
+        theme_color: '#1956C5',
+        // Resolved from --color-bg (slate-50, oklch(0.985 0.003 248)).
+        background_color: '#F8FAFB',
         display: 'standalone',
         start_url: base,
         scope: base,
+        // TODO: replace pwa.svg with a true maskable icon (512×512 PNG with
+        // safe-zone padding) and a separate non-maskable variant.
         icons: [
           {
             src: 'pwa.svg',

@@ -9,13 +9,16 @@ const withPublicSchema = (databaseUrl?: string) => {
   return `${databaseUrl}${databaseUrl.includes('?') ? '&' : '?'}schema=public`;
 };
 
+const databaseUrl = withPublicSchema(process.env['DATABASE_URL']);
+const shadowDatabaseUrl = withPublicSchema(process.env['SHADOW_DATABASE_URL']);
+
 export default defineConfig({
   schema: './schema.prisma',
   migrations: {
     path: './migrations',
   },
   datasource: {
-    url: withPublicSchema(process.env['DATABASE_URL']),
-    shadowDatabaseUrl: withPublicSchema(process.env['SHADOW_DATABASE_URL']),
+    url: databaseUrl,
+    shadowDatabaseUrl: shadowDatabaseUrl === databaseUrl ? undefined : shadowDatabaseUrl,
   },
 });

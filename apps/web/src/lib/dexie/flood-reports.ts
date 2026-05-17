@@ -1,4 +1,5 @@
-import { db, type AddFloodReportInput, type FloodReport, type OutboxItem } from './schema';
+import { dexie } from './client';
+import type { AddFloodReportInput, FloodOutboxItem, FloodReport } from './types';
 
 const floodReportLifetimeMs = 6 * 60 * 60 * 1000;
 
@@ -11,11 +12,11 @@ export type FloodReportWithSyncStatus = FloodReport & {
 export async function listFloodReports() {
   const now = Date.now();
 
-  await db.floodReports.where('expiresAt').below(now).modify({ status: 'expired' });
+  await dexie.floodReports.where('expiresAt').below(now).modify({ status: 'expired' });
 
   const [reports, outboxItems] = await Promise.all([
-    db.floodReports.orderBy('createdAt').reverse().toArray(),
-    db.outbox.toArray(),
+    dexie.floodReports.orderBy('createdAt').reverse().toArray(),
+    dexie.outbox.toArray(),
   ]);
   const outboxByEntityId = new Map(outboxItems.map(item => [item.entityId, item]));
 
@@ -41,7 +42,7 @@ export async function addFloodReport(input: AddFloodReportInput) {
     createdAt: now,
     expiresAt: now + floodReportLifetimeMs,
   };
-  const outboxItem: OutboxItem = {
+  const outboxItem: FloodOutboxItem = {
     id: crypto.randomUUID(),
     type: 'flood-report.create',
     entityId: reportId,
@@ -54,16 +55,16 @@ export async function addFloodReport(input: AddFloodReportInput) {
     syncedAt: null,
   };
 
-  await db.transaction('rw', db.floodReports, db.outbox, async () => {
-    await db.floodReports.add(report);
-    await db.outbox.add(outboxItem);
+  await dexie.transaction('rw', dexie.floodReports, dexie.outbox, async () => {
+    await dexie.floodReports.add(report);
+    await dexie.outbox.add(outboxItem);
   });
 
   return report;
 }
 
 export async function getFloodOutboxSummary() {
-  const items = await db.outbox
+  const items = await dexie.outbox
     .where('type')
     .equals('flood-report.create')
     .and(item => item.status !== 'synced')
@@ -79,7 +80,7 @@ export async function getFloodOutboxSummary() {
 
 function getFloodReportSyncStatus(
   report: FloodReport,
-  outboxItem: OutboxItem | undefined
+  outboxItem: FloodOutboxItem | undefined
 ): FloodReportSyncStatus {
   if (outboxItem?.status === 'syncing') return 'syncing';
   if (outboxItem?.status === 'failed') return 'failed';

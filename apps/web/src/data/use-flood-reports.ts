@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { addFloodReport, getFloodOutboxSummary, listFloodReports } from '../db/flood-reports';
+import { addFloodReport, getFloodOutboxSummary, listFloodReports } from '@/lib/dexie';
 import { syncOutbox } from '../services/outbox/sync-outbox';
 
 export const floodReportsQueryKey = ['flood-reports'];

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { useFloodReports } from '../data/use-flood-reports';
-import type { FloodReportWithSyncStatus } from '../db/flood-reports';
+import type { FloodReportWithSyncStatus } from '@/lib/dexie';
 import { useCurrentLocation } from '../hooks/use-current-location';
 import { formatDistance, getDistanceMeters } from '../utils/geo';
 
