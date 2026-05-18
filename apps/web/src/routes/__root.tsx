@@ -24,6 +24,7 @@ import {
   useSyncReportHistoriesMutation,
 } from '@/hooks/query/report-histories';
 import { useAuth } from '@/lib/auth';
+import { cn } from '@/lib/utils';
 
 type RouterContext = {
   queryClient: QueryClient;
@@ -74,7 +75,12 @@ function FloatingTabBar() {
           <TabBarLink to="/hotlines" label="Emergency" icon={IconPhoneCall} />
           <button
             type="button"
-            className="flex min-h-14 flex-col items-center justify-center gap-1 rounded-md px-2 py-1 text-caption text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className={cn(
+              'flex min-h-14 flex-col items-center justify-center gap-1 rounded-md px-2 py-1 text-caption font-semibold transition-colors',
+              isMenuOpen
+                ? 'bg-primary text-text-on-primary shadow-sm hover:bg-primary hover:text-text-on-primary'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+            )}
             aria-label="Open menu"
             aria-expanded={isMenuOpen}
             onClick={() => setIsMenuOpen(true)}
@@ -100,11 +106,15 @@ function TabBarLink({
   icon: typeof IconAlertTriangle;
 }) {
   const baseClasses =
-    'flex min-h-14 flex-col items-center justify-center gap-1 rounded-md px-2 py-1 text-caption text-muted-foreground transition-colors hover:bg-muted hover:text-foreground';
-  const activeClasses = `${baseClasses} bg-primary-soft font-semibold text-primary hover:bg-primary-soft hover:text-primary`;
+    'flex min-h-14 flex-col items-center justify-center gap-1 rounded-md px-2 py-1 text-caption font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground';
+  const activeClasses = `${baseClasses} bg-primary text-text-on-primary shadow-sm hover:bg-primary hover:text-text-on-primary`;
 
   return (
-    <Link to={to} className={baseClasses} activeProps={{ className: activeClasses }}>
+    <Link
+      to={to}
+      className={baseClasses}
+      activeProps={{ className: activeClasses, 'aria-current': 'page' }}
+    >
       <Icon aria-hidden="true" className="size-5" />
       <span>{label}</span>
     </Link>
@@ -187,20 +197,22 @@ function MenuSheet({ onClose }: { onClose: () => void }) {
         className="absolute inset-0 bg-slate-900/35"
         onClick={onClose}
       />
-      <section className="relative max-h-[88dvh] w-full overflow-y-auto rounded-t-lg border border-border bg-surface p-4 shadow-lg sm:max-w-lg sm:rounded-lg sm:p-5">
-        <div className="mb-4 flex items-start justify-between gap-3">
-          <div className="flex flex-col gap-1">
-            <h2 className="text-heading-md text-foreground">Menu</h2>
-            <p className="text-label-md text-muted-foreground">
-              Manage family access and coordinator tools.
-            </p>
+      <section className="relative flex h-[min(88dvh,44rem)] w-full flex-col overflow-hidden rounded-t-lg border border-border bg-surface shadow-lg sm:max-w-lg sm:rounded-lg">
+        <div className="border-b border-border px-4 py-4 sm:px-5">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-col gap-1">
+              <h2 className="text-heading-md text-foreground">Menu</h2>
+              <p className="text-label-md text-muted-foreground">
+                Manage family access and coordinator tools.
+              </p>
+            </div>
+            <Button type="button" variant="ghost" size="icon" aria-label="Close" onClick={onClose}>
+              <IconX aria-hidden="true" className="size-4" />
+            </Button>
           </div>
-          <Button type="button" variant="ghost" size="icon" aria-label="Close" onClick={onClose}>
-            <IconX aria-hidden="true" className="size-4" />
-          </Button>
         </div>
 
-        <div className="flex flex-col gap-5">
+        <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 py-4 sm:px-5">
           <section className="flex flex-col gap-3">
             <div className="flex items-center justify-between gap-3">
               <div className="flex flex-col gap-1">

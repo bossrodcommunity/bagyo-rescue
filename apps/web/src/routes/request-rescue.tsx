@@ -5,6 +5,6 @@ export const Route = createFileRoute('/request-rescue')({
   component: RequestRescuePage,
 });
 
-export function RequestRescuePage() {
+function RequestRescuePage() {
   return <ReportActionPage type="Rescue Request" />;
 }

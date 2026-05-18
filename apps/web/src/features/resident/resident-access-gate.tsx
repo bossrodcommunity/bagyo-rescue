@@ -241,69 +241,80 @@ export function ResidentAccessPanel({
           />
         </div>
 
-        {activeMode === 'scan' ? (
-          <section className="flex flex-col gap-3" aria-label="Scan QR">
-            <div className="flex aspect-video items-center justify-center overflow-hidden rounded-md bg-foreground">
-              <video
-                ref={videoRef}
-                muted
-                playsInline
-                aria-label="QR scanner camera preview"
-                className="size-full object-cover"
-              />
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Button
-                type="button"
-                size="md"
-                disabled={accessMutation.isPending}
-                aria-label="Start camera"
-                onClick={handleStartCamera}
-              >
-                <IconCamera aria-hidden="true" />
-                Simulan
-              </Button>
-              {isCameraActive ? (
+        <div className="min-h-[13rem]">
+          {activeMode === 'scan' ? (
+            <section className="flex flex-col gap-3" aria-label="Scan QR">
+              <div className="flex aspect-video items-center justify-center overflow-hidden rounded-md bg-foreground">
+                <video
+                  ref={videoRef}
+                  muted
+                  playsInline
+                  aria-label="QR scanner camera preview"
+                  className="size-full object-cover"
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
                 <Button
-                  variant="secondary"
-                  size="md"
                   type="button"
-                  aria-label="Stop camera"
-                  onClick={() => {
-                    stopCamera();
-                    setScanStatus(null);
-                  }}
+                  size="md"
+                  disabled={accessMutation.isPending}
+                  aria-label="Start camera"
+                  onClick={handleStartCamera}
                 >
-                  <IconPlayerStop aria-hidden="true" />
-                  Itigil
+                  <IconCamera aria-hidden="true" />
+                  Simulan
                 </Button>
-              ) : null}
-            </div>
-          </section>
-        ) : null}
+                {isCameraActive ? (
+                  <Button
+                    variant="secondary"
+                    size="md"
+                    type="button"
+                    aria-label="Stop camera"
+                    onClick={() => {
+                      stopCamera();
+                      setScanStatus(null);
+                    }}
+                  >
+                    <IconPlayerStop aria-hidden="true" />
+                    Itigil
+                  </Button>
+                ) : null}
+              </div>
+            </section>
+          ) : null}
 
-        {activeMode === 'upload' ? (
-          <section className="flex flex-col gap-3" aria-label="Upload QR">
-            <label
-              htmlFor={uploadInputId}
-              className="flex min-h-32 cursor-pointer flex-col items-center justify-center gap-2 rounded-md border border-dashed border-border bg-surface-sunken p-6 text-center text-foreground hover:bg-muted/40"
-            >
-              <IconPhotoUp aria-hidden="true" className="size-7 text-muted-foreground" />
-              <span className="text-body-md">Mag-upload ng family QR image</span>
-              <span className="text-caption text-muted-foreground">
-                PNG, JPG, or a clear screenshot.
-              </span>
-            </label>
-            <input
-              id={uploadInputId}
-              className="sr-only"
-              type="file"
-              accept="image/*"
-              disabled={accessMutation.isPending}
-              onChange={handleQrUpload}
-            />
-          </section>
-        ) : null}
+          {activeMode === 'upload' ? (
+            <section className="flex flex-col gap-3" aria-label="Upload QR">
+              <label
+                htmlFor={uploadInputId}
+                className="flex min-h-48 cursor-pointer flex-col items-center justify-center gap-2 rounded-md border border-dashed border-border bg-surface-sunken p-6 text-center text-foreground hover:bg-muted/40"
+              >
+                <IconPhotoUp aria-hidden="true" className="size-7 text-muted-foreground" />
+                <span className="text-body-md">Mag-upload ng family QR image</span>
+                <span className="text-caption text-muted-foreground">
+                  PNG, JPG, or a clear screenshot.
+                </span>
+              </label>
+              <input
+                id={uploadInputId}
+                className="sr-only"
+                type="file"
+                accept="image/*"
+                disabled={accessMutation.isPending}
+                onChange={handleQrUpload}
+              />
+            </section>
+          ) : null}
+
+          {activeMode === 'manual' ? (
+            <div className="flex min-h-48 flex-col justify-center rounded-md border border-dashed border-border bg-surface-sunken p-4">
+              <p className="text-body-md font-medium text-foreground">Enter your family code.</p>
+              <p className="text-label-md text-muted-foreground">
+                Use the code from your QR card, then enter the 4-digit PIN below.
+              </p>
+            </div>
+          ) : null}
+        </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_10rem]">
           <Label htmlFor="familyCode">
@@ -383,10 +394,10 @@ function AccessTabButton({
       aria-selected={isActive}
       onClick={onClick}
       className={cn(
-        'inline-flex min-h-11 items-center justify-center gap-2 px-3 py-2 text-label-md transition-colors',
+        'inline-flex min-h-11 items-center justify-center gap-2 px-3 py-2 text-label-md font-semibold transition-colors',
         !isLast && 'border-r border-border',
         isActive
-          ? 'bg-surface text-foreground font-semibold'
+          ? 'bg-primary text-text-on-primary shadow-sm'
           : 'bg-surface-sunken text-muted-foreground hover:text-foreground'
       )}
     >
