@@ -18,3 +18,11 @@ pnpm lint
 pnpm format
 pnpm check:all
 ```
+
+## Supabase Types
+
+To refresh the generated Supabase types:
+
+```sh
+pnpm supabase:types
+```
