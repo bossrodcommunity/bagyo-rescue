@@ -38,6 +38,7 @@ import { OfflineBadge, useOnlineStatus } from '@/components/ui/offline-badge';
 import { Page, PageDescription, PageHeader, PageTitle } from '@/components/ui/page';
 import { Toast, ToastBody, ToastClose } from '@/components/ui/toast';
 import { cn } from '@/lib/utils';
+import floodPersonModelUrl from '@/assets/reporting/flood-person-model.png';
 
 type CapturedLocation = {
   latitude: number;
@@ -54,12 +55,12 @@ type FloodReportWaterLevel = NonNullable<ReportHistoryWaterLevel>;
 const DEFAULT_FLOOD_REPORT_WATER_LEVEL = 'Unknown' satisfies FloodReportWaterLevel;
 
 const WATER_LEVEL_OPTIONS = [
+  { value: 'Unknown', label: 'Unknown', description: 'Hindi sigurado' },
   { value: 'Ankle', label: 'Ankle', description: 'Bukong-bukong' },
   { value: 'Knee', label: 'Knee', description: 'Tuhod' },
   { value: 'Waist', label: 'Waist', description: 'Baywang' },
   { value: 'Chest', label: 'Chest', description: 'Dibdib' },
   { value: 'Roof', label: 'Roof', description: 'Bubong' },
-  { value: 'Unknown', label: 'Unknown', description: 'Hindi sigurado' },
 ] satisfies Array<{
   value: FloodReportWaterLevel;
   label: string;
@@ -75,12 +76,14 @@ function getFloodReportWaterLevel(value: string | null | undefined) {
 function WaterLevelButtonGroup({
   id,
   name = 'waterLevel',
-  defaultValue,
+  value,
+  onChange,
   className,
 }: {
   id: string;
   name?: string;
-  defaultValue: FloodReportWaterLevel;
+  value: FloodReportWaterLevel;
+  onChange: (value: FloodReportWaterLevel) => void;
   className?: string;
 }) {
   const legendId = `${id}-legend`;
@@ -92,33 +95,128 @@ function WaterLevelButtonGroup({
           <span className="font-medium">Water level</span>
         </span>
       </legend>
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        {WATER_LEVEL_OPTIONS.map(option => (
-          <label key={option.value} className="block cursor-pointer">
-            <input
-              className="peer sr-only"
-              type="radio"
-              name={name}
-              value={option.value}
-              defaultChecked={option.value === defaultValue}
-            />
-            <span
-              className={cn(
-                'flex h-20 flex-col items-center justify-center gap-1 rounded-md border border-border bg-surface px-2.5 py-3 text-center',
-                'transition-colors hover:border-primary/60 hover:bg-primary-soft/30',
-                'peer-focus-visible:border-primary peer-focus-visible:ring-1 peer-focus-visible:ring-ring',
-                'peer-checked:border-primary peer-checked:bg-primary-soft/70 peer-checked:text-primary'
-              )}
-            >
-              <span className="text-body-md font-semibold leading-tight">{option.label}</span>
-              <span className="text-caption leading-tight text-muted-foreground">
-                {option.description}
+      <div className="grid grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-2">
+          {WATER_LEVEL_OPTIONS.map(option => (
+            <label key={option.value} className="block cursor-pointer">
+              <input
+                className="peer sr-only"
+                type="radio"
+                name={name}
+                value={option.value}
+                checked={option.value === value}
+                onChange={() => onChange(option.value)}
+              />
+              <span
+                className={cn(
+                  'flex h-[4.25rem] flex-col items-center justify-center gap-1 rounded-md border border-border bg-surface px-2 py-2 text-center sm:h-20 sm:px-2.5 sm:py-3',
+                  'transition-colors hover:border-primary/60 hover:bg-primary-soft/30',
+                  'peer-focus-visible:border-primary peer-focus-visible:ring-1 peer-focus-visible:ring-ring',
+                  'peer-checked:border-primary peer-checked:bg-primary-soft/70 peer-checked:text-primary'
+                )}
+              >
+                <span className="text-body-md font-semibold leading-tight">{option.label}</span>
+                <span className="text-caption leading-tight text-muted-foreground">
+                  {option.description}
+                </span>
               </span>
-            </span>
-          </label>
-        ))}
+            </label>
+          ))}
+        </div>
+        <FloodLevelPersonScale value={value} />
       </div>
     </fieldset>
+  );
+}
+
+const WATER_LEVEL_SCALE: Record<
+  FloodReportWaterLevel,
+  {
+    label: string;
+    heightPercent: number;
+    markerTopPercent: number;
+    bandClassName: string;
+    markerClassName: string;
+  }
+> = {
+  Ankle: {
+    label: 'Ankle level',
+    heightPercent: 18,
+    markerTopPercent: 82,
+    bandClassName: 'bg-[#FDE68A]',
+    markerClassName: 'border-[#D97706]',
+  },
+  Knee: {
+    label: 'Knee level',
+    heightPercent: 34,
+    markerTopPercent: 66,
+    bandClassName: 'bg-[#FDBA74]',
+    markerClassName: 'border-[#EA580C]',
+  },
+  Waist: {
+    label: 'Waist level',
+    heightPercent: 50,
+    markerTopPercent: 50,
+    bandClassName: 'bg-danger/25',
+    markerClassName: 'border-danger',
+  },
+  Chest: {
+    label: 'Chest level',
+    heightPercent: 62,
+    markerTopPercent: 38,
+    bandClassName: 'bg-danger/35',
+    markerClassName: 'border-danger',
+  },
+  Roof: {
+    label: 'Above head or roof level',
+    heightPercent: 84,
+    markerTopPercent: 16,
+    bandClassName: 'bg-danger/45',
+    markerClassName: 'border-danger',
+  },
+  Unknown: {
+    label: 'Unknown water level',
+    heightPercent: 0,
+    markerTopPercent: 50,
+    bandClassName: 'bg-muted',
+    markerClassName: 'border-muted-foreground',
+  },
+};
+
+function FloodLevelPersonScale({ value }: { value: FloodReportWaterLevel }) {
+  const scale = WATER_LEVEL_SCALE[value];
+  const isUnknown = value === 'Unknown';
+
+  return (
+    <div
+      className="relative mx-auto flex h-full min-h-[27rem] w-full items-end justify-center overflow-hidden rounded-md border border-border bg-surface sm:min-h-[31rem]"
+      aria-label={`Flood level visualization: ${scale.label}`}
+    >
+      <div
+        aria-hidden="true"
+        className={cn(
+          'absolute inset-x-0 bottom-0 transition-[height] duration-200',
+          scale.bandClassName
+        )}
+        style={{ height: `${scale.heightPercent}%` }}
+      />
+      {!isUnknown ? (
+        <div
+          aria-hidden="true"
+          className={cn('absolute left-0 right-0 z-20 border-t-2', scale.markerClassName)}
+          style={{ top: `${scale.markerTopPercent}%` }}
+        />
+      ) : null}
+      <img
+        src={floodPersonModelUrl}
+        alt=""
+        aria-hidden="true"
+        className="relative z-10 h-[24rem] w-full max-w-36 object-contain sm:h-[28rem] sm:max-w-48"
+      />
+      <span className="absolute bottom-2 left-2 z-20 rounded-md bg-surface/95 px-2 py-1 text-caption font-semibold text-foreground shadow-raised">
+        {isUnknown ? 'Unknown' : value}
+      </span>
+    </div>
   );
 }
 
@@ -163,6 +261,9 @@ function ReportForm({
   const [formError, setFormError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [isLocating, setIsLocating] = useState(false);
+  const [selectedWaterLevel, setSelectedWaterLevel] = useState<FloodReportWaterLevel>(() =>
+    getFloodReportWaterLevel(access?.session.house.water_level)
+  );
 
   const reportHistories = reportHistoriesQuery.data ?? [];
   const queuedCount = useMemo(
@@ -170,6 +271,12 @@ function ReportForm({
     [reportHistories]
   );
   const isFloodReport = type === 'Flood Report';
+  const shouldPrioritizeRescue =
+    isFloodReport && ['Waist', 'Chest', 'Roof'].includes(selectedWaterLevel);
+
+  useEffect(() => {
+    setSelectedWaterLevel(getFloodReportWaterLevel(access?.session.house.water_level));
+  }, [access?.session.house.water_level]);
 
   useEffect(() => {
     if (!feedback) return;
@@ -206,8 +313,7 @@ function ReportForm({
       form.get('peopleCount') ?? access?.session.family.total_members ?? 1
     );
     const note = String(form.get('note') ?? '').trim();
-    const waterLevel = (String(form.get('waterLevel') ?? '') ||
-      null) as ReportHistoryWaterLevel | null;
+    const waterLevel = isFloodReport ? selectedWaterLevel : null;
 
     if (!isFloodReport && !capturedLocation) {
       setFormError('Kunin muna ang GPS location.');
@@ -244,6 +350,7 @@ function ReportForm({
       {
         onSuccess: reportHistory => {
           formElement.reset();
+          setSelectedWaterLevel(getFloodReportWaterLevel(access?.session.house.water_level));
           setCapturedLocation(null);
           setFeedback(
             !access
@@ -299,8 +406,19 @@ function ReportForm({
               <WaterLevelButtonGroup
                 id="waterLevel"
                 className="sm:col-span-2"
-                defaultValue={getFloodReportWaterLevel(access?.session.house.water_level)}
+                value={selectedWaterLevel}
+                onChange={setSelectedWaterLevel}
               />
+            ) : null}
+
+            {shouldPrioritizeRescue ? (
+              <Alert tone="danger" className="sm:col-span-2">
+                <AlertTitle>Rescue priority notice</AlertTitle>
+                <AlertBody>
+                  This level may need urgent rescue. Add GPS and details so responders can
+                  prioritize this report.
+                </AlertBody>
+              </Alert>
             ) : null}
 
             <Label htmlFor="phoneNumber">
@@ -672,6 +790,9 @@ function ReportHistoryEditForm({
   const [isLocating, setIsLocating] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [selectedWaterLevel, setSelectedWaterLevel] = useState<FloodReportWaterLevel>(() =>
+    getFloodReportWaterLevel(reportHistory.water_level)
+  );
 
   async function handleLocate() {
     setLocationError(null);
@@ -695,8 +816,7 @@ function ReportHistoryEditForm({
     const phoneNumber = normalizePhoneNumber(String(form.get('phoneNumber') ?? ''));
     const peopleCount = Number(form.get('peopleCount') ?? 0);
     const note = String(form.get('note') ?? '').trim();
-    const waterLevel = (String(form.get('waterLevel') ?? '') ||
-      null) as ReportHistoryWaterLevel | null;
+    const waterLevel = isFloodReport ? selectedWaterLevel : null;
 
     if (phoneNumber && !isValidPhoneNumber(phoneNumber)) {
       setEditError('Ilagay ang tamang phone number.');
@@ -761,7 +881,8 @@ function ReportHistoryEditForm({
           <WaterLevelButtonGroup
             id={`edit-water-${reportHistory.id}`}
             className="sm:col-span-2"
-            defaultValue={getFloodReportWaterLevel(reportHistory.water_level)}
+            value={selectedWaterLevel}
+            onChange={setSelectedWaterLevel}
           />
         ) : null}
 
