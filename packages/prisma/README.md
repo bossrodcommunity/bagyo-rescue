@@ -37,6 +37,7 @@ pnpm --filter @bagyo-rescue/prisma db:deploy
 pnpm --filter @bagyo-rescue/prisma db:status
 pnpm --filter @bagyo-rescue/prisma db:pull
 pnpm db:seed:test
+pnpm db:seed:psgc
 ```
 
 `pnpm db:seed:test` executes `packages/prisma/scripts/seed-testing.sql`.
@@ -44,3 +45,9 @@ It creates a repeatable test dataset with 10 LGUs, 100 barangays, 200 houses,
 200 families, 1000 residents, 50 evacuation centers, 120 evacuation center
 assignments, and 360 contact persons. Seeded rows use `seed_*` IDs and are
 replaced on each run without deleting non-seed data.
+
+`pnpm db:seed:psgc` executes
+`packages/prisma/scripts/seed-psgc-locations.sql`. It creates a repeatable
+Philippine PSGC location dataset with 1,642 LGUs and 42,010 barangays from the
+PSGC as of 31 March 2026. Seeded rows use `psgc_*` IDs and are replaced on each
+run without deleting non-seed data.
