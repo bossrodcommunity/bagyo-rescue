@@ -1,13 +1,13 @@
 CREATE TYPE "report_history_type" AS ENUM (
-  'Flood Report',
-  'Rescue Request'
+  'flood_report',
+  'rescue_request'
 );
 
 CREATE TYPE "report_history_status" AS ENUM (
-  'New',
-  'Acknowledged',
-  'Responding',
-  'Resolved'
+  'new',
+  'acknowledged',
+  'responding',
+  'resolved'
 );
 
 CREATE TABLE "report_histories" (
@@ -25,7 +25,7 @@ CREATE TABLE "report_histories" (
   "people_count" INTEGER,
   "note" TEXT,
   "source" TEXT NOT NULL DEFAULT 'web',
-  "status" "report_history_status" NOT NULL DEFAULT 'New',
+  "status" "report_history_status" NOT NULL DEFAULT 'new',
   "client_created_at" TIMESTAMPTZ(6) NOT NULL,
   "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updated_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -59,7 +59,7 @@ CREATE POLICY "report_histories_public_insert"
   TO anon, authenticated
   WITH CHECK (
     "source" = 'web'
-    AND "status" = 'New'
+    AND "status" = 'new'
     AND "access_method" IN ('scan', 'upload', 'manual')
     AND ("latitude" IS NULL OR ("latitude" >= -90 AND "latitude" <= 90))
     AND ("longitude" IS NULL OR ("longitude" >= -180 AND "longitude" <= 180))

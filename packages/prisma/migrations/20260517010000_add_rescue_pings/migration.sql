@@ -1,8 +1,8 @@
 CREATE TYPE "rescue_ping_status" AS ENUM (
-  'New',
-  'Acknowledged',
-  'Responding',
-  'Resolved'
+  'new',
+  'acknowledged',
+  'responding',
+  'resolved'
 );
 
 CREATE TABLE "rescue_pings" (
@@ -13,7 +13,7 @@ CREATE TABLE "rescue_pings" (
   "accuracy_meters" DECIMAL(10, 2),
   "note" TEXT,
   "source" TEXT NOT NULL DEFAULT 'web',
-  "status" "rescue_ping_status" NOT NULL DEFAULT 'New',
+  "status" "rescue_ping_status" NOT NULL DEFAULT 'new',
   "client_created_at" TIMESTAMPTZ(6) NOT NULL,
   "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updated_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,

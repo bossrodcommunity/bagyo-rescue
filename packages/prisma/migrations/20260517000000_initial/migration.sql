@@ -1,87 +1,87 @@
 -- Enable UUID generation for text IDs with domain-specific prefixes.
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
-CREATE TYPE "risk_level" AS ENUM ('Low', 'Medium', 'High', 'Critical');
+CREATE TYPE "risk_level" AS ENUM ('low', 'medium', 'high', 'critical');
 
 CREATE TYPE "house_status" AS ENUM (
-  'Not Checked',
-  'Safe',
-  'Needs Assistance',
-  'Needs Rescue',
-  'Evacuated'
+  'not_checked',
+  'safe',
+  'needs_assistance',
+  'needs_rescue',
+  'evacuated'
 );
 
 CREATE TYPE "water_level" AS ENUM (
-  'None',
-  'Ankle',
-  'Knee',
-  'Waist',
-  'Chest',
-  'Roof',
-  'Unknown'
+  'none',
+  'ankle',
+  'knee',
+  'waist',
+  'chest',
+  'roof',
+  'unknown'
 );
 
 CREATE TYPE "sex" AS ENUM (
-  'Male',
-  'Female',
-  'Other',
-  'Prefer Not To Say'
+  'male',
+  'female',
+  'other',
+  'prefer_not_to_say'
 );
 
 CREATE TYPE "resident_status" AS ENUM (
-  'Inside House',
-  'Evacuated',
-  'Missing / Unconfirmed',
-  'Needs Rescue',
-  'Safe'
+  'inside_house',
+  'evacuated',
+  'missing_or_unconfirmed',
+  'needs_rescue',
+  'safe'
 );
 
 CREATE TYPE "contact_entity_type" AS ENUM (
-  'LGU',
-  'Barangay',
-  'Area',
-  'House',
-  'Family',
-  'Evacuation Center'
+  'lgu',
+  'barangay',
+  'area',
+  'house',
+  'family',
+  'evacuation_center'
 );
 
 CREATE TYPE "contact_role" AS ENUM (
-  'LGU Admin',
-  'MDRRMO Officer',
-  'Barangay Captain',
-  'Barangay Secretary',
-  'Responder',
-  'Purok Leader',
-  'Household Representative',
-  'Family Head',
-  'Relative',
-  'Volunteer'
+  'lgu_admin',
+  'mdrrmo_officer',
+  'barangay_captain',
+  'barangay_secretary',
+  'responder',
+  'purok_leader',
+  'household_representative',
+  'family_head',
+  'relative',
+  'volunteer'
 );
 
 CREATE TYPE "evacuation_center_type" AS ENUM (
-  'School',
-  'Covered Court',
-  'Gymnasium',
-  'Barangay Hall',
-  'Church',
-  'Community Center',
-  'Other'
+  'school',
+  'covered_court',
+  'gymnasium',
+  'barangay_hall',
+  'church',
+  'community_center',
+  'other'
 );
 
 CREATE TYPE "evacuation_center_status" AS ENUM (
-  'Open',
-  'Near Capacity',
-  'Full',
-  'Closed',
-  'Unavailable'
+  'open',
+  'near_capacity',
+  'full',
+  'closed',
+  'unavailable'
 );
 
 CREATE TYPE "evacuation_assignment_status" AS ENUM (
-  'Assigned',
-  'Checked In',
-  'Transferred',
-  'Left',
-  'Missing / Unconfirmed'
+  'assigned',
+  'checked_in',
+  'transferred',
+  'left',
+  'missing_or_unconfirmed'
 );
 
 CREATE TABLE "lgus" (
@@ -114,8 +114,8 @@ CREATE TABLE "houses" (
   "landmark" TEXT,
   "latitude" DECIMAL(9, 6),
   "longitude" DECIMAL(9, 6),
-  "current_status" "house_status" NOT NULL DEFAULT 'Not Checked',
-  "water_level" "water_level" NOT NULL DEFAULT 'Unknown',
+  "current_status" "house_status" NOT NULL DEFAULT 'not_checked',
+  "water_level" "water_level" NOT NULL DEFAULT 'unknown',
   "last_checked_at" TIMESTAMPTZ(6),
   "last_checked_by" TEXT,
   "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -160,7 +160,7 @@ CREATE TABLE "residents" (
   "is_child" BOOLEAN NOT NULL DEFAULT false,
   "is_pwd" BOOLEAN NOT NULL DEFAULT false,
   "is_pregnant" BOOLEAN NOT NULL DEFAULT false,
-  "current_status" "resident_status" NOT NULL DEFAULT 'Inside House',
+  "current_status" "resident_status" NOT NULL DEFAULT 'inside_house',
   "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updated_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -190,14 +190,14 @@ CREATE TABLE "evacuation_centers" (
   "lgu_id" TEXT NOT NULL,
   "barangay_id" TEXT,
   "name" TEXT NOT NULL,
-  "type" "evacuation_center_type" NOT NULL DEFAULT 'Other',
+  "type" "evacuation_center_type" NOT NULL DEFAULT 'other',
   "address" TEXT NOT NULL,
   "landmark" TEXT,
   "latitude" DECIMAL(9, 6),
   "longitude" DECIMAL(9, 6),
   "capacity" INTEGER NOT NULL DEFAULT 0,
   "current_occupancy" INTEGER NOT NULL DEFAULT 0,
-  "status" "evacuation_center_status" NOT NULL DEFAULT 'Open',
+  "status" "evacuation_center_status" NOT NULL DEFAULT 'open',
   "has_food_supply" BOOLEAN NOT NULL DEFAULT false,
   "has_water_supply" BOOLEAN NOT NULL DEFAULT false,
   "has_medical_support" BOOLEAN NOT NULL DEFAULT false,
@@ -217,7 +217,7 @@ CREATE TABLE "evacuation_center_assignments" (
   "family_id" TEXT NOT NULL,
   "house_id" TEXT NOT NULL,
   "number_of_people" INTEGER NOT NULL DEFAULT 0,
-  "status" "evacuation_assignment_status" NOT NULL DEFAULT 'Assigned',
+  "status" "evacuation_assignment_status" NOT NULL DEFAULT 'assigned',
   "arrived_at" TIMESTAMPTZ(6),
   "left_at" TIMESTAMPTZ(6),
   "notes" TEXT,

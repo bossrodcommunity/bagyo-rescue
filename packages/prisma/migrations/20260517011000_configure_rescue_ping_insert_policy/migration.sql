@@ -12,7 +12,7 @@ CREATE POLICY "rescue_pings_public_insert"
     AND "longitude" <= 180
     AND ("accuracy_meters" IS NULL OR "accuracy_meters" >= 0)
     AND "source" = 'web'
-    AND "status" = 'New'
+    AND "status" = 'new'
   );
 
 GRANT INSERT ON TABLE "rescue_pings" TO anon, authenticated;
