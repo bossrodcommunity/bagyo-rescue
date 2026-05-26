@@ -7,6 +7,7 @@ import {
   IconMapPin,
   IconPhoneCall,
   IconRefresh,
+  IconShieldCheck,
   IconX,
 } from '@tabler/icons-react';
 import { useMemo } from 'react';
@@ -40,6 +41,12 @@ const actions = [
     title: 'Emergency Hotlines',
     description: 'Call national and local emergency numbers.',
     icon: IconPhoneCall,
+  },
+  {
+    to: '/safety-tips' as const,
+    title: 'Safety Tips',
+    description: 'Prepare before, during, and after a typhoon.',
+    icon: IconShieldCheck,
   },
 ];
 
@@ -92,7 +99,7 @@ function HomePage() {
         </PageDescription>
       </PageHeader>
 
-      <section aria-label="Emergency actions" className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <section aria-label="Emergency actions" className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
         {actions.map(action => {
           const Icon = action.icon;
 
