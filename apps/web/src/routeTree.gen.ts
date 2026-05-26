@@ -20,6 +20,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RecordsIndexRouteImport } from './routes/records/index'
 import { Route as RecordsResidentsRouteImport } from './routes/records/residents'
+import { Route as RecordsQrGeneratorRouteImport } from './routes/records/qr-generator'
 import { Route as RecordsLgusRouteImport } from './routes/records/lgus'
 import { Route as RecordsHousesRouteImport } from './routes/records/houses'
 import { Route as RecordsFamiliesRouteImport } from './routes/records/families'
@@ -83,6 +84,11 @@ const RecordsResidentsRoute = RecordsResidentsRouteImport.update({
   path: '/residents',
   getParentRoute: () => RecordsRoute,
 } as any)
+const RecordsQrGeneratorRoute = RecordsQrGeneratorRouteImport.update({
+  id: '/qr-generator',
+  path: '/qr-generator',
+  getParentRoute: () => RecordsRoute,
+} as any)
 const RecordsLgusRoute = RecordsLgusRouteImport.update({
   id: '/lgus',
   path: '/lgus',
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/records/families': typeof RecordsFamiliesRoute
   '/records/houses': typeof RecordsHousesRoute
   '/records/lgus': typeof RecordsLgusRoute
+  '/records/qr-generator': typeof RecordsQrGeneratorRoute
   '/records/residents': typeof RecordsResidentsRoute
   '/records/': typeof RecordsIndexRoute
 }
@@ -157,6 +164,7 @@ export interface FileRoutesByTo {
   '/records/families': typeof RecordsFamiliesRoute
   '/records/houses': typeof RecordsHousesRoute
   '/records/lgus': typeof RecordsLgusRoute
+  '/records/qr-generator': typeof RecordsQrGeneratorRoute
   '/records/residents': typeof RecordsResidentsRoute
   '/records': typeof RecordsIndexRoute
 }
@@ -178,6 +186,7 @@ export interface FileRoutesById {
   '/records/families': typeof RecordsFamiliesRoute
   '/records/houses': typeof RecordsHousesRoute
   '/records/lgus': typeof RecordsLgusRoute
+  '/records/qr-generator': typeof RecordsQrGeneratorRoute
   '/records/residents': typeof RecordsResidentsRoute
   '/records/': typeof RecordsIndexRoute
 }
@@ -200,6 +209,7 @@ export interface FileRouteTypes {
     | '/records/families'
     | '/records/houses'
     | '/records/lgus'
+    | '/records/qr-generator'
     | '/records/residents'
     | '/records/'
   fileRoutesByTo: FileRoutesByTo
@@ -219,6 +229,7 @@ export interface FileRouteTypes {
     | '/records/families'
     | '/records/houses'
     | '/records/lgus'
+    | '/records/qr-generator'
     | '/records/residents'
     | '/records'
   id:
@@ -239,6 +250,7 @@ export interface FileRouteTypes {
     | '/records/families'
     | '/records/houses'
     | '/records/lgus'
+    | '/records/qr-generator'
     | '/records/residents'
     | '/records/'
   fileRoutesById: FileRoutesById
@@ -334,6 +346,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RecordsResidentsRouteImport
       parentRoute: typeof RecordsRoute
     }
+    '/records/qr-generator': {
+      id: '/records/qr-generator'
+      path: '/qr-generator'
+      fullPath: '/records/qr-generator'
+      preLoaderRoute: typeof RecordsQrGeneratorRouteImport
+      parentRoute: typeof RecordsRoute
+    }
     '/records/lgus': {
       id: '/records/lgus'
       path: '/lgus'
@@ -394,6 +413,7 @@ interface RecordsRouteChildren {
   RecordsFamiliesRoute: typeof RecordsFamiliesRoute
   RecordsHousesRoute: typeof RecordsHousesRoute
   RecordsLgusRoute: typeof RecordsLgusRoute
+  RecordsQrGeneratorRoute: typeof RecordsQrGeneratorRoute
   RecordsResidentsRoute: typeof RecordsResidentsRoute
   RecordsIndexRoute: typeof RecordsIndexRoute
 }
@@ -407,6 +427,7 @@ const RecordsRouteChildren: RecordsRouteChildren = {
   RecordsFamiliesRoute: RecordsFamiliesRoute,
   RecordsHousesRoute: RecordsHousesRoute,
   RecordsLgusRoute: RecordsLgusRoute,
+  RecordsQrGeneratorRoute: RecordsQrGeneratorRoute,
   RecordsResidentsRoute: RecordsResidentsRoute,
   RecordsIndexRoute: RecordsIndexRoute,
 }
