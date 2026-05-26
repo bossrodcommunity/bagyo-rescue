@@ -7,7 +7,9 @@
     "db:deploy": "prisma migrate deploy",
     "db:dev": "prisma migrate dev",
     "db:status": "prisma migrate status",
-    "db:seed:test": "prisma db execute --file ./scripts/seed-testing.sql"
+    "db:seed:test": "prisma db execute --file ./scripts/seed-testing.sql",
+    "db:seed:psgc": "prisma db execute --file ./scripts/seed-psgc.sql",
+    "db:seed:psgc:generate": "node ./scripts/generate-psgc-seed.mjs"
   },
   "devDependencies": {
     "dotenv": "^17.4.2",
